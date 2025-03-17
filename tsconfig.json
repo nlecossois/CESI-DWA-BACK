@@ -1,8 +1,12 @@
 {
   "compilerOptions": {
+    "target": "ES6",
     "moduleResolution": "NodeNext",
     "module": "NodeNext",
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "strictPropertyInitialization": false
   },
   "include": [
     "src/**/*.ts"
