@@ -3,73 +3,39 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { addUser } from "../controlleur/user";
 import { User } from "../model/user-model";
+import { authenticateToken } from "../controlleur/authenticate";
+import { Restaurant } from "../model/restaurant-model";
+import { UserType } from "../model/user-type";
 
 const router = express.Router();
 const SECRET_KEY = process.env.JWT_SECRET || "isEmptyJWT_KEY"; 
 
-
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  if (!authHeader) return res.status(401).json({ error: 'Accès refusé' });
-
-  const token = authHeader.split(' ')[1];
-  if (!token) return res.status(401).json({ error: 'Token invalide' });
-
-  jwt.verify(token, SECRET_KEY, (err, user) => {
-    if (err) return res.status(403).json({ error: 'Token expiré ou invalide' });
-
-    req.user = user;
-    next();
-  });
-}; 
-
-router.post('/create', authenticateToken, async (req: any, res: any) => {
-  const { name, email, password, type } = req.body;
-
-  try {
-    // Vérifier si l'utilisateur authentifié est un Admin
-    if (req.user.type !== 'admin') {
-      return res.status(403).json({ error: "Accès refusé. Seuls les admins peuvent créer des utilisateurs." });
-    }
-
-    const existingUser = await User.findOne({ where: { email } });
-
-    if (existingUser) {
-      return res.status(400).json({ error: 'Cet email est déjà utilisé' });
-    }
-
-    const allowedUserTypes = ['client', 'livreur', 'restaurant'];
-    if (!allowedUserTypes.includes(type)) {
-      return res.status(403).json({ error: 'Création non autorisée pour ce type d\'utilisateur' });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await User.create({
-      id: uuidv4(),
-      name,
-      email,
-      password: hashedPassword,
-      type
-    });
-
-    res.status(201).json({ message: "Utilisateur créé avec succès", user });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: `Erreur serveur : ${err}` });
-  }
-});
-
 router.post('/register', async (req: any, res: any) => {
-    const { name, email, password, role } = req.body;
-    const isAdmin = req.user?.role === 'Admin'; // Vérifier si l'utilisateur authentifié est un admin
-
+    const { name, email, password, type, extra } = req.body;  // On récupère extra
     try {
-        const user: User = await addUser(res, name, email, password, role, isAdmin);
+        // Ajout de extra dans la fonction addUser
+        const userConfig = { name, email, password, type, extra };
+        const user: User = await addUser(res, userConfig, true, userConfig.type);
+
         const token = jwt.sign({ id: user.id, name: user.name, email: user.email, type: user.type }, SECRET_KEY, { expiresIn: '4h' });
+        
         res.status(201).json({ message: "Inscription réussie", user, token });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: `Erreur serveur : ${err}` });
+        res.status(500).json({ error: `Erreur serveur : ${err.message}` });
+    }
+});
+
+router.post('/create', authenticateToken, async (req: any, res: any) => {
+    const { name, email, password, type, extra } = req.body;
+    try {
+        const id = req.user.id;
+        const user = await User.findOne({ where: { id } });
+        const newUser = await addUser(res, { name, email, password, type, extra }, false, user.type);
+        res.status(201).json({ message: "Utilisateur créé", newUser });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: `Erreur serveur : ${err.message}` });
     }
 });
 
@@ -105,6 +71,27 @@ router.get('/:id', authenticateToken, async (req, res) => {
   }
 });
 
+router.delete('/:id', authenticateToken, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const user = await User.findOne({ where: { id } });    
+
+    if (!user) return res.status(404).json({ error: 'Utilisateur non trouvé' });
+
+    if (user.type === UserType.RESTAURANT) {
+      await Restaurant.destroy({ where: { ownerId: user.id } });
+    }
+
+    await user.destroy()
+
+    res.json(user);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: `Erreur serveur : ${err}` });
+  }
+});
+
 router.get('/', authenticateToken, async (req, res) => {
   try {
 
@@ -126,7 +113,4 @@ router.get('/', authenticateToken, async (req, res) => {
 });
 
 export default router;
-function uuidv4(): unknown {
-  throw new Error("Function not implemented.");
-}
 

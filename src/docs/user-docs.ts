@@ -49,7 +49,8 @@
  *                   properties:
  *                     id:
  *                       type: string
- *                       example: 1
+ *                       format: uuid
+ *                       example: "550e8400-e29b-41d4-a716-446655440000"
  *                     name:
  *                       type: string
  *                       example: "John Doe"
@@ -70,10 +71,56 @@
 
 /**
  * @swagger
+ * /users/create:
+ *   post:
+ *     summary: Créer un utilisateur avec authentification
+ *     description: Permet à un utilisateur authentifié de créer un nouvel utilisateur.
+ *     tags:
+ *       - Utilisateurs
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - email
+ *               - password
+ *               - type
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: "Jane Doe"
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: "jane.doe@example.com"
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 example: "password123"
+ *               type:
+ *                 type: string
+ *                 enum: [admin, user]
+ *                 example: "user"
+ *     responses:
+ *       201:
+ *         description: Utilisateur créé avec succès
+ *       403:
+ *         description: Accès refusé
+ *       500:
+ *         description: Erreur serveur
+ */
+
+/**
+ * @swagger
  * /users/login:
  *   post:
- *     summary: Connexion d'un utilisateur
- *     description: Permet à un utilisateur de se connecter en fournissant son email et son mot de passe.
+ *     summary: Authentification de l'utilisateur
+ *     description: Permet à un utilisateur de se connecter et de recevoir un token JWT.
  *     tags:
  *       - Utilisateurs
  *     requestBody:
@@ -97,108 +144,18 @@
  *     responses:
  *       201:
  *         description: Connexion réussie
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Connexion réussie"
- *                 user:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: string
- *                       example: 1
- *                     email:
- *                       type: string
- *                       example: "john.doe@example.com"
- *                 token:
- *                   type: string
- *                   example: "eyJhbGciOiJIUzI1NiIsInR..."
  *       401:
- *         description: Identifiants incorrects ou utilisateur inexistant
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: "Identifiants incorrects"
+ *         description: Identifiants incorrects
  *       500:
  *         description: Erreur serveur
- */
-
-/**
- * @swagger
- * /users:
- *   get:
- *     summary: Récupérer tous les utilisateurs
- *     description: Permet de récupérer la liste de tous les utilisateurs enregistrés dans la base de données. L'accès est protégé par un token d'authentification.
- *     tags:
- *       - Utilisateurs
- *     security:
- *       - BearerAuth: []
- *     responses:
- *       200:
- *         description: Liste des utilisateurs récupérée avec succès
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: string
- *                     format: uuid
- *                     example: "550e8400-e29b-41d4-a716-446655440000"
- *                   name:
- *                     type: string
- *                     example: "Jean Dupont"
- *                   email:
- *                     type: string
- *                     example: "jean.dupont@example.com"
- *       404:
- *         description: Aucun utilisateur trouvé
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: "Aucun utilisateur trouvé"
- *       401:
- *         description: Accès refusé (Token invalide ou manquant)
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: "Accès refusé"
- *       500:
- *         description: Erreur serveur
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: "Erreur serveur : <message d'erreur>"
  */
 
 /**
  * @swagger
  * /users/{id}:
  *   get:
- *     summary: Récupérer un utilisateur par son ID
- *     description: Permet de récupérer un utilisateur spécifique à partir de son ID dans la base de données. L'accès est protégé par un token d'authentification.
+ *     summary: Récupérer un utilisateur par ID
+ *     description: Permet de récupérer les informations d'un utilisateur spécifique.
  *     tags:
  *       - Utilisateurs
  *     security:
@@ -207,57 +164,59 @@
  *       - in: path
  *         name: id
  *         required: true
- *         description: UUID de l'utilisateur à récupérer
  *         schema:
  *           type: string
  *           format: uuid
- *           example: "550e8400-e29b-41d4-a716-446655440000"
  *     responses:
  *       200:
- *         description: L'utilisateur a été trouvé et renvoyé
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: string
- *                   format: uuid
- *                   example: "550e8400-e29b-41d4-a716-446655440000"
- *                 name:
- *                   type: string
- *                   example: "John Doe"
- *                 email:
- *                   type: string
- *                   example: "john.doe@example.com"
+ *         description: Utilisateur trouvé
  *       404:
  *         description: Utilisateur non trouvé
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: "Utilisateur non trouvé"
- *       401:
- *         description: Accès refusé (Token invalide ou manquant)
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: "Accès refusé"
  *       500:
  *         description: Erreur serveur
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: "Erreur serveur : <message d'erreur>"
+ */
+
+/**
+ * @swagger
+ * /users/{id}:
+ *   delete:
+ *     summary: Supprimer un utilisateur par ID
+ *     description: Permet de supprimer un utilisateur spécifique.
+ *     tags:
+ *       - Utilisateurs
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Utilisateur supprimé
+ *       404:
+ *         description: Utilisateur non trouvé
+ *       500:
+ *         description: Erreur serveur
+ */
+
+/**
+ * @swagger
+ * /users:
+ *   get:
+ *     summary: Récupérer la liste des utilisateurs
+ *     description: Permet à un administrateur de récupérer tous les utilisateurs.
+ *     tags:
+ *       - Utilisateurs
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Liste des utilisateurs
+ *       403:
+ *         description: Accès refusé
+ *       500:
+ *         description: Erreur serveur
  */
