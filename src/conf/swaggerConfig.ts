@@ -1,7 +1,7 @@
 import { Options } from 'swagger-jsdoc';
 
 const swaggerOptions: Options = {
-  definition: { // Ajout de "definition"
+  definition: {
     openapi: '3.0.0',
     info: {
       title: 'API Express avec Swagger',
@@ -20,7 +20,7 @@ const swaggerOptions: Options = {
     },
     security: [{ BearerAuth: [] }],
   },
-  apis: ['./src/docs/*.ts'], // Chemin inchangé
+  apis: ['./src/docs/*.ts'],
 };
 
 

@@ -17,7 +17,7 @@ export class User extends Model {
   @Column({ primaryKey: true, type: DataType.UUID, defaultValue: DataType.UUIDV4 })
   declare id: string;
 
-  @Column({ type: DataType.ENUM('Client', 'Restaurateur', 'Livreur', 'Developpeur', 'Commercial', 'Technique'), allowNull: false })
+  @Column({ type: DataType.ENUM('Client', 'Restaurant', 'Livreur', 'Developpeur', 'Commercial', 'Technique'), allowNull: false })
   type!: string;
 
   @Column({ type: DataType.STRING, allowNull: false })
@@ -28,7 +28,4 @@ export class User extends Model {
 
   @Column({ type: DataType.STRING, allowNull: false })
   password!: string;
-
-  @Column({ type: DataType.STRING, allowNull: true })
-  phone!: string;
 }

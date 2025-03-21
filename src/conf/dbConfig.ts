@@ -1,5 +1,10 @@
 import { Sequelize } from 'sequelize-typescript';
 import { User } from '../model/user-model';
+import { Client } from '../model/client-model';
+import { Restaurant } from '../model/restaurant-model';
+import { Livreur } from '../model/livreur-model';
+import { Type } from '../model/type-model';
+import { RestaurantType } from '../model/restaurantType-model';
 
 const dbOption = { db:"postgres", user: "postgres", password:"password", host:"localhost" }
 
@@ -9,7 +14,7 @@ export const sequelize = new Sequelize({
   username: dbOption.user,
   password: dbOption.password,
   database: dbOption.db,
-  models: [User],
+  models: [User, Client, Restaurant, Livreur, Type, RestaurantType],
   logging: false,  
 })
 

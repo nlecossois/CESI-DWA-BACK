@@ -1,10 +1,11 @@
 import express from "express";
 import cors from "cors";
 import users from "./views/user";
+import restaurants from "./views/restaurant"
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import { initializeDatabase, sequelize } from './conf/dbConfig'; 
-import { createAdminIfNotExists } from './conf/initializeAdmin'; 
+import { createAdminIfNotExists, initializeTypes } from './conf/initialize'; 
 import swaggerOptions from './conf/swaggerConfig'; 
 import { getHtmlPage } from './conf/htmlPageConfig'; 
 
@@ -19,6 +20,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/users", users);
+app.use("/restaurants", restaurants);
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
@@ -29,6 +31,7 @@ const startServer = async () => {
     await sequelize.sync({ force: false }); 
     console.log("✅ Tables synchronisées");
     await createAdminIfNotExists();
+    await initializeTypes();
 
     app.listen(port, () => {
       console.log(`🚀 Serveur lancé sur http://localhost:${port}`);
