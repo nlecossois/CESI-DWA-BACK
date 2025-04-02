@@ -19,5 +19,5 @@ Enfin, vous pourez lancer la commande **make up** pour initialiser votre projet.
 ## Procédure de dépannage
 En cas de soucis avec le projet, pensez à réinitialiser les micro-services:
 - **make down**
-  **make delete**
-  **make up**
+- **make delete**
+- **make up**
