@@ -1,0 +1,17 @@
+up:
+	docker-compose up -d
+	powershell -Command "Write-Host 'Containers are up and running.' -ForegroundColor Green"
+
+down:
+	docker-compose down
+	powershell -Command "Write-Host 'Containers have been stopped.' -ForegroundColor Red"
+
+dev: up
+	start http://localhost:8080/?username=postgres
+	start http://localhost:3000
+	start http://localhost:3001
+	powershell -Command "Write-Host 'Development environment is ready.' -ForegroundColor Cyan"
+
+delete:
+	docker system prune -af --volumes
+	powershell -Command "Write-Host 'Containers have been rebuilt and are up and running.' -ForegroundColor Green"
