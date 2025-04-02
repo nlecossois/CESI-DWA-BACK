@@ -16,3 +16,6 @@ dev: up
 delete:
 	docker system prune -af --volumes
 	powershell -Command "Write-Host 'Containers have been rebuilt and are up and running.' -ForegroundColor Green"
+
+restart: down up
+	powershell -Command "Write-Host 'Containers have been restarted.' -ForegroundColor Yellow"
