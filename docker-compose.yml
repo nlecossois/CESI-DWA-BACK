@@ -1,0 +1,126 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:17
+    container_name: postgres_db
+    restart: always
+    env_file: .env
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx_gateway
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - user-service
+      - restaurant-service
+      - client-services
+      - livreur-services
+      - articles-services
+      - commande-services
+
+  user-service:
+    build: ./services/user-service
+    container_name: user-service
+    depends_on:
+      - db
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://${DB_USER}:${DB_PASSWORD}@db:${DB_PORT}/${DB_NAME}
+    ports:
+      - "${USER_SERVICE_PORT}:3000"
+    volumes:
+      - ./services/user-service:/app
+      - /app/node_modules
+
+  restaurant-service:
+    build: ./services/restaurant-service
+    container_name: restaurant-service
+    depends_on:
+      - db
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://${DB_USER}:${DB_PASSWORD}@db:${DB_PORT}/${DB_NAME}
+    ports:
+      - "${RESTAURANT_SERVICE_PORT}:3001"
+    volumes:
+      - ./services/restaurant-service:/app
+      - /app/node_modules
+
+  client-services:
+    build: ./services/client-services
+    container_name: client-services
+    depends_on:
+      - db
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://${DB_USER}:${DB_PASSWORD}@db:${DB_PORT}/${DB_NAME}
+    ports:
+      - "${CLIENT_SERVICE_PORT}:3002"
+    volumes:
+      - ./services/client-services:/app
+      - /app/node_modules
+
+  livreur-services:
+    build: ./services/livreur-services
+    container_name: livreur-services
+    depends_on:
+      - db
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://${DB_USER}:${DB_PASSWORD}@db:${DB_PORT}/${DB_NAME}
+    ports:
+      - "${LIVREUR_SERVICE_PORT}:3003"
+    volumes:
+      - ./services/livreur-services:/app
+      - /app/node_modules
+
+  articles-services:
+    build: ./services/articles-services
+    container_name: articles-services
+    depends_on:
+      - db
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://${DB_USER}:${DB_PASSWORD}@db:${DB_PORT}/${DB_NAME}
+    ports:
+      - "${ARTICLES_SERVICE_PORT}:3004"
+    volumes:
+      - ./services/articles-services:/app
+      - /app/node_modules
+
+  commande-services:
+    build: ./services/commande-services
+    container_name: commande-services
+    depends_on:
+      - db
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://${DB_USER}:${DB_PASSWORD}@db:${DB_PORT}/${DB_NAME}
+    ports:
+      - "${COMMANDE_SERVICE_PORT}:3005"
+    volumes:
+      - ./services/commande-services:/app
+      - /app/node_modules
+
+  adminer:
+    image: adminer:latest
+    container_name: adminer
+    ports:
+      - "8080:8080"  
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
