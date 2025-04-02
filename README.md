@@ -21,3 +21,6 @@ En cas de soucis avec le projet, pensez à réinitialiser les micro-services:
 - **make down**
 - **make delete**
 - **make up**
+
+## Utilisation de l'API
+En local l'api s'appelle via **http://localhost/**
