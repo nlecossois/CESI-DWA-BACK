@@ -11,6 +11,7 @@ dev: up
 	start http://localhost:3000
 	start http://localhost:3001
 	powershell -Command "Write-Host 'Development environment is ready.' -ForegroundColor Cyan"
+	powershell -Command "if (Test-Path 'C:\Program Files\MongoDB Compass\MongoDBCompass.exe') { Start-Process 'C:\Program Files\MongoDB Compass\MongoDBCompass.exe' 'mongodb://localhost:27017/' } else { Write-Host 'MongoDB Compass is not installed.' -ForegroundColor Yellow }"
 
 delete:
 	docker system prune -af --volumes
