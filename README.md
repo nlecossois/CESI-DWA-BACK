@@ -15,6 +15,7 @@ Enfin, vous pourez lancer la commande **make up** pour initialiser votre projet.
  /!\ Bien exécuter cette commande avant d'éteindre Docker, votre IDE, de push ou d'éteindre votre poste /!\
 - **make dev** (initialise / lance toutes les images docker du projet et lance les environnement de développement)
 - **make delete** (A utiliser après un make down uniquement, permet de supprimer les conteneurs pour une réinitialisation propre)
+- **make restart** (Redémarre l'ensemble des conteneurs)
 
 ## Procédure de dépannage
 En cas de soucis avec le projet, pensez à réinitialiser les micro-services:
