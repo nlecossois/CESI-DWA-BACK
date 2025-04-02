@@ -19,3 +19,6 @@ delete:
 
 restart: down up
 	powershell -Command "Write-Host 'Containers have been restarted.' -ForegroundColor Yellow"
+
+reset: down delete up
+	powershell -Command "Write-Host 'Containers have been reset.' -ForegroundColor Red"
