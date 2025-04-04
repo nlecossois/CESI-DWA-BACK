@@ -1,5 +1,5 @@
 up:
-	docker-compose up -d
+	docker-compose up
 	powershell -Command "Write-Host 'Containers are up and running.' -ForegroundColor Green"
 
 down:
