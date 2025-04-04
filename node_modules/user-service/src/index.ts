@@ -11,11 +11,23 @@ import { getHtmlPage } from './conf/htmlPageConfig';
 const app = express();
 const PORT = process.env.USER_SERVICE_PORT || 3000;
 
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+// Configuration CORS
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
 app.get("/", (req, res) => {
   res.send(getHtmlPage());
+});
+
+app.use((req, res, next) => {
+    console.log("📢 Requête reçue :", req.method, req.originalUrl);
+    next();
 });
 
 app.use("/users", users);
