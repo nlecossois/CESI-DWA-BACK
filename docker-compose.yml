@@ -13,6 +13,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+
   adminer:
     image: adminer:latest
     container_name: adminer
@@ -20,6 +21,18 @@ services:
       - "8080:8080"
     depends_on:
       - db
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo_db
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
 
   nginx:
     image: nginx:latest
@@ -41,6 +54,10 @@ services:
       context: ./services/user-service
       dockerfile: Dockerfile
     container_name: user-service
+    depends_on:
+      - db
+      - mongo
+    env_file: .env
     environment:
       - ACCESS_JWT_KEY=${ACCESS_JWT_KEY}
       - DB_HOST=db
@@ -61,6 +78,10 @@ services:
       context: ./services/restaurant-service
       dockerfile: Dockerfile
     container_name: restaurant-service
+    depends_on:
+      - db
+      - mongo
+    env_file: .env
     environment:
       - DB_HOST=db
       - DB_PORT=${DB_PORT}
@@ -80,6 +101,10 @@ services:
       context: ./services/client-services
       dockerfile: Dockerfile
     container_name: client-services
+    depends_on:
+      - db
+      - mongo
+    env_file: .env
     environment:
       - DB_HOST=db
       - DB_PORT=${DB_PORT}
@@ -99,6 +124,10 @@ services:
       context: ./services/livreur-services
       dockerfile: Dockerfile
     container_name: livreur-services
+    depends_on:
+      - db
+      - mongo
+    env_file: .env
     environment:
       - DB_HOST=db
       - DB_PORT=${DB_PORT}
@@ -118,6 +147,10 @@ services:
       context: ./services/articles-services
       dockerfile: Dockerfile
     container_name: articles-services
+    depends_on:
+      - db
+      - mongo
+    env_file: .env
     environment:
       - DB_HOST=db
       - DB_PORT=${DB_PORT}
@@ -137,6 +170,10 @@ services:
       context: ./services/commande-services
       dockerfile: Dockerfile
     container_name: commande-services
+    depends_on:
+      - db
+      - mongo
+    env_file: .env
     environment:
       - DB_HOST=db
       - DB_PORT=${DB_PORT}
@@ -168,3 +205,4 @@ services:
 
 volumes:
   postgres_data:
+  mongo_data:
