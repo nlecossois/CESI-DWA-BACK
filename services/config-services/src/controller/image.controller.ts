@@ -51,13 +51,27 @@ const imageController = {
                 return res.status(400).send("Aucune image fournie.");
             }
 
-            // Image uploadée avec succès
-            const imageUUID = req.file.filename.split('.')[0]; // Extraire l'UUID du nom du fichier
-            const imagePath = path.join(imageDirectory, req.file.filename);
+            // Extraire l'extension du fichier
+            const fileExtension = path.extname(req.file.originalname);
+
+            // Extraire l'UUID du nom du fichier sans l'extension
+            const imageUUID = req.file.filename.split('.')[0];
+
+            // Construire le nouveau nom de fichier avec l'UUID et l'extension
+            const newFileName = `${imageUUID}${fileExtension}`;
+
+            // Renommer le fichier avec l'extension
+            const oldPath = path.join(imageDirectory, req.file.filename);
+            const newPath = path.join(imageDirectory, newFileName);
+
+            // Renommer le fichier sur le système de fichiers
+            fs.renameSync(oldPath, newPath);
+
+            // Retourner la réponse avec l'URL et le UUID
             return res.status(200).send({
                 message: "🚀 Image uploadée avec succès",
                 uuid: imageUUID,
-                url: `http://localhost:3000/public/images/${req.file.filename}`,
+                url: `http://localhost:3000/public/images/${newFileName}`,
             });
         } catch (error: unknown) {
             if (error instanceof Error) {
