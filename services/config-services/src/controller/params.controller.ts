@@ -29,8 +29,26 @@ const paramsController = {
         }
     },
 
+    getParam: async (param: String) => {
+        try {
+            const foundParam = await Param.findOne({ param });
+            if (foundParam) {
+                return foundParam;
+            } else {
+                console.error(`❌ Paramètre '${param}' non trouvé`);
+                return null;
+            }
+        } catch (error: unknown){
+            if(error instanceof Error) {
+                console.error("❌ Erreur lors de la récupération du paramètre :", error.message);
+            } else {
+                console.error("❌ Erreur inconnue");
+            }
+        }
+    },
+
     // Méthode pour récupérer un paramètre spécifique par son nom
-    getParam: async (req: Request, res: Response) => {
+    callGetParam: async (req: Request, res: Response) => {
         const { param } = req.params; // Récupère le paramètre du nom du paramètre
 
         try {

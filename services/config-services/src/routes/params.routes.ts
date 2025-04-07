@@ -4,5 +4,5 @@ import {Application} from "express";
 
 export default function registerParamsRoutes(app: Application) {
     app.get("/config/getParams", paramsController.getParams);
-    app.get("/config/getParam/:param", paramsController.getParam);
+    app.get("/config/getParam/:param", paramsController.callGetParam);
 }
