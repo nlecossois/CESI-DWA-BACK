@@ -1,4 +1,3 @@
-import Config from "../models/config.schema.ts";
 import { Request, Response } from "express";
 import {unlink} from "fs";
 import paramsController from "./params.controller.ts";

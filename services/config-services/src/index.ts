@@ -10,6 +10,7 @@ import { initializeTypes } from "./conf/init";
 import registerConfigRoutes from "./routes/config.routes.ts";
 import registerParamsRoutes from "./routes/params.routes.ts";
 import registerImageRoutes from "./routes/image.routes.ts";
+import registerLogsRoutes from "./routes/logs.routes.ts";
 import dotenv from "dotenv";
 import paramsController from "./controller/params.controller";  // Import du contrôleur
 import path from 'path';
@@ -39,6 +40,7 @@ app.use("/public/images", express.static(path.join(__dirname, "public", "images"
 registerConfigRoutes(app);
 registerParamsRoutes(app);
 registerImageRoutes(app);
+registerLogsRoutes(app);
 app.use((req, res, next) => {
     console.log("📢 Requête reçue :", req.method, req.originalUrl);
     next();
