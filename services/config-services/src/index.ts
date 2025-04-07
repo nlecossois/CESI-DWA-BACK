@@ -14,8 +14,6 @@ import dotenv from "dotenv";
 import paramsController from "./controller/params.controller";  // Import du contrôleur
 import path from 'path';
 
-
-
 dotenv.config();
 
 const app = express();
@@ -35,7 +33,7 @@ app.get("/", (req, res) => {
     res.send(getHtmlPage());
 });
 
-app.use('/public', express.static(path.join(__dirname, 'public')));
+app.use("/public/images", express.static(path.join(__dirname, "public", "images")));
 
 //Définition des routes
 registerConfigRoutes(app);
