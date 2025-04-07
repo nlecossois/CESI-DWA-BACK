@@ -4,9 +4,9 @@ const swaggerOptions: Options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'API Express avec Swagger',
+      title: 'API config-service',
       version: '1.0.0',
-      description: 'Documentation de l\'API',
+      description: 'Documentation de l\'API Config Service',
     },
     servers: [{ url: 'http://localhost:4007' }],
     components: {

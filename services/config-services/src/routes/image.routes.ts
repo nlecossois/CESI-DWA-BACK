@@ -1,6 +1,5 @@
 import imageController from "../controller/image.controller.ts";
 import {Application} from "express";
-
 import multer from "multer";
 const upload = multer({ dest: "public/images/" });
 
