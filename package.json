@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "choco": "^0.2.1",
-    "make": "^0.0.0"
+    "make": "^0.0.0",
+    "multer": "^1.4.5-lts.2"
   }
 }
