@@ -123,5 +123,35 @@ router.delete('/:id', async (req: any, res: any) => {
   }
 });
 
+router.put('/update-password', async (req: any, res: any) => {
+    const { oldPassword, newPassword } = req.body;
+    const userId = req.user.id; // Récupère l'ID de l'utilisateur connecté depuis le token
+
+    try {
+        // Vérifie que l'utilisateur existe
+        const user = await User.findOne({ where: { id: userId } });
+        if (!user) {
+            return res.status(404).json({ error: 'Utilisateur non trouvé' });
+        }
+
+        // Vérifie que l'ancien mot de passe est correct
+        const match = await bcrypt.compare(oldPassword, user.password);
+        if (!match) {
+            return res.status(401).json({ error: 'Ancien mot de passe incorrect' });
+        }
+
+        // Hash le nouveau mot de passe
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        
+        // Met à jour le mot de passe
+        await user.update({ password: hashedPassword });
+
+        res.json({ message: 'Mot de passe mis à jour avec succès' });
+    } catch (err: any) {
+        console.error(err);
+        res.status(500).json({ error: `Erreur serveur : ${err.message}` });
+    }
+});
+
 export default router;
 
