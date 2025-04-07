@@ -1,1 +1,9 @@
 node_modules
+/services/config-services/node_modules
+/services/notification-services/node_modules
+/services/articles-services/node_modules
+/services/auth-service/node_modules
+/services/client-services/node_modules
+/services/commande-services/node_modules
+/services/livreur-services/node_modules
+/services/user-service/node_modules
