@@ -307,13 +307,14 @@ const logsController = {
         }
     },
 
-    postLogDownload: async (req: Request, res: Response) => {
+    postLogDownload: async (req: Request, res: Response): Promise<any> => {
         try {
             const { userId, componentName } = req.body;
             //On génère la data
             const date : number = Date.now();
             const newLogDownload = new LogDownload({ userId, date, componentName });
             await newLogDownload.save();
+
             res.status(200).send({
                 message: "🚀 Log de téléchargement enregistré avec succès",
                 data: newLogDownload,
