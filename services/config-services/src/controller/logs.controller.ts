@@ -218,9 +218,9 @@ const logsController = {
     //Enregistrer une commande en log
     postLogCommand: async (req: Request, res: Response) => {
         try {
-            const { uuid, uuid_client, uuid_livreur, uuid_restaurant, final_status, prixTTC, articles, menus } = req.body;
+            const { uuid, uuid_client, uuid_livreur, uuid_restaurant, final_status, prixCart, prixTTC, articles, menus } = req.body;
             const date : number = Date.now();
-            const newLogCommand = new LogCommand({ uuid, uuid_client, uuid_livreur, uuid_restaurant, date, final_status, prixTTC, articles, menus });
+            const newLogCommand = new LogCommand({ uuid, uuid_client, uuid_livreur, uuid_restaurant, date, final_status, prixCart, prixTTC, articles, menus });
             await newLogCommand.save();
             res.status(200).send({
                 message: "🚀 Log de commande enregistré avec succès",
@@ -279,6 +279,7 @@ const logsController = {
                     uuid_restaurant: log.uuid_restaurant,
                     date: decomposedDate,
                     final_status: log.final_status,
+                    prixCart: log.prixCart,
                     prixTTC: log.prixTTC,
                     articles: log.articles,
                     menus: log.menus,

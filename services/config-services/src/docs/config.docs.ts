@@ -103,7 +103,6 @@
  *             required:
  *               - address1
  *               - address2
- *               - address3
  *               - cartValue
  *             properties:
  *               address1:

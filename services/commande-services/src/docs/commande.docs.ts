@@ -70,6 +70,143 @@
 
 /**
  * @swagger
+ * /commande/stats/restaurant/{uuid}:
+ *   get:
+ *     summary: Récupère les statistiques d'un restaurant
+ *     tags:
+ *       - Statistiques Restaurants
+ *     parameters:
+ *       - in: path
+ *         name: uuid
+ *         required: true
+ *         description: UUID du restaurant
+ *         schema:
+ *           type: string
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Statistiques d'un restaurant récupérées avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Statistiques du restaurant récupérées avec succès
+ *                 stats:
+ *                   type: object
+ *                   properties:
+ *                     Commandes:
+ *                       type: integer
+ *                       example: 10
+ *                     Total:
+ *                       type: number
+ *                       format: float
+ *                       example: 120.0
+ *                     mostSoldArticleId:
+ *                       type: string
+ *                       example: article-uuid-1
+ *                     leastSoldArticleId:
+ *                       type: string
+ *                       example: article-uuid-9
+ *                     mostSoldMenuId:
+ *                       type: string
+ *                       example: menu-uuid-3
+ *                     leastSoldMenuId:
+ *                       type: string
+ *                       example: menu-uuid-7
+ *       400:
+ *         description: UUID du restaurant manquant
+ *       404:
+ *         description: Aucune commande trouvée pour ce restaurant
+ *       500:
+ *         description: Erreur interne
+ */
+/**
+ * @swagger
+ * /commande/stats/getTransactionnal:
+ *   get:
+ *     summary: Récupère le chiffre d'affaires transactionnel en cours
+ *     tags:
+ *       - Statistiques Commandes
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Chiffre d'affaires transactionnel récupéré avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: CA Transactionnel récupérée avec succès
+ *                 Commandes en cours:
+ *                   type: integer
+ *                   example: 12
+ *                 servicePrice:
+ *                   type: number
+ *                   format: float
+ *                   example: 2.5
+ *                 CA Transactionnel en cours:
+ *                   type: number
+ *                   format: float
+ *                   example: 30.0
+ *       401:
+ *         description: Accès non autorisé
+ *       403:
+ *         description: Privilèges insuffisants
+ *       500:
+ *         description: Erreur interne
+ */
+
+/**
+ * @swagger
+ * /commande/stats/getGlobalCA:
+ *   get:
+ *     summary: Récupère le chiffre d'affaires global (en cours + historiques)
+ *     tags:
+ *       - Statistiques Commandes
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Chiffre d'affaires global récupéré avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: CA Global récupérée avec succès
+ *                 Commandes en cours:
+ *                   type: integer
+ *                   example: 5
+ *                 Commandes totales:
+ *                   type: integer
+ *                   example: 30
+ *                 servicePrice:
+ *                   type: number
+ *                   format: float
+ *                   example: 2.5
+ *                 CA Global:
+ *                   type: number
+ *                   format: float
+ *                   example: 75.0
+ *       401:
+ *         description: Accès non autorisé
+ *       403:
+ *         description: Privilèges insuffisants
+ *       500:
+ *         description: Erreur interne
+ */
+
+ /**
+ * @swagger
  * /commande/createCommande:
  *   post:
  *     tags:
