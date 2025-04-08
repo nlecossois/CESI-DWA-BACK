@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 
 import LogLogin from "../models/logLogin.model.ts";
 import LogCommand from "../models/logCommand.model.ts";
+import LogDownload from "../models/logDownload.model.ts";
 import jwt from 'jsonwebtoken';
 
 const SECRET_KEY = process.env.ACCESS_JWT_KEY || "isEmptyJWT_KEY";
@@ -301,6 +302,91 @@ const logsController = {
                 console.error("❌ Erreur inconnue :", error);
                 res.status(500).send({
                     message: "Erreur inconnue lors de la récupération des logs de connexion",
+                });
+            }
+        }
+    },
+
+    postLogDownload: async (req: Request, res: Response): Promise<any> => {
+        try {
+            const { userId, componentName } = req.body;
+            //On génère la data
+            const date : number = Date.now();
+            const newLogDownload = new LogDownload({ userId, date, componentName });
+            await newLogDownload.save();
+
+            res.status(200).send({
+                message: "🚀 Log de téléchargement enregistré avec succès",
+                data: newLogDownload,
+            });
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                console.error("❌ Erreur lors de l'enregistrement du log de téléchargement :", error.message);
+                res.status(500).send({
+                    message: "Erreur lors de l'enregistrement du log de téléchargement",
+                    error: error.message,
+                });
+            } else {
+                console.error("❌ Erreur inconnue :", error);
+                res.status(500).send({
+                    message: "Erreur inconnue lors de l'enregistrement du log de téléchargement",
+                });
+            }
+        }
+    },
+
+    getLogsDownload: async (req: Request, res: Response): Promise<any> => {
+        try {
+            const allowedRoles = ['admin', 'technique'];
+            const token = req.headers.authorization?.split(' ')[1];
+
+            if (!token) {
+                return res.status(401).json({ error: 'Accès refusé : non identifié' });
+            }
+
+            const decoded = jwt.verify(token, SECRET_KEY) as any;
+
+            if (!allowedRoles.includes(decoded.type)) {
+                return res.status(403).json({ error: 'Accès refusé : privilèges insuffisants' });
+            }
+
+            //On récupère toutes les logs
+            const logs = await LogDownload.find();
+            //On va formater les logs
+            const formattedLogs = logs.map(log => {
+                const date = new Date(log.date);
+
+                const decomposedDate = {
+                    day: date.getDate().toString().padStart(2, '0'),
+                    month: (date.getMonth() + 1).toString().padStart(2, '0'), // Mois commence à 0
+                    year: date.getFullYear().toString(),
+                    hour: date.getHours().toString().padStart(2, '0'),
+                    minute: date.getMinutes().toString().padStart(2, '0'),
+                    second: date.getSeconds().toString().padStart(2, '0'),
+                };
+
+                return {
+                    userId: log.userId,
+                    date: decomposedDate,
+                    componentName: log.componentName,
+                };
+            });
+            res.status(200).send({
+                message: "🚀 Logs de téléchargement récupérés avec succès",
+                data: formattedLogs,
+            });
+
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                console.error("❌ Erreur lors de la récupération des logs de téléchargement :", error.message);
+                res.status(500).send({
+                    message: "Erreur lors de la récupération des logs de téléchargement",
+                    error: error.message,
+                });
+            } else {
+                console.error("❌ Erreur inconnue :", error);
+                res.status(500).send({
+                    message: "Erreur inconnue lors de la récupération des logs de téléchargement",
                 });
             }
         }

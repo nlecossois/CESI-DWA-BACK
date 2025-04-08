@@ -30,6 +30,28 @@ const logsController = {
                 articles
             });
 
+
+            //On envoie une notification au restaurant
+            const token = req.headers.authorization?.split(' ')[1];
+            if (!token) {
+                return res.status(401).json({ error: 'Accès refusé : non identifié' });
+            }
+            await fetch("http://config-services:3007/config/postNotification", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    userId: restaurantId,
+                    type: "info",
+                    title: "Nouvelle commande",
+                    message: `Vous avez une nouvelle commande à traiter`,
+                }),
+            }).catch(err => {
+                console.error("❌ Erreur lors de l'envoi du de la notification :", err);
+            });
+
             // Réponse de succès
             res.status(201).send({
                 message: "Commande créée avec succès",
@@ -117,6 +139,71 @@ const logsController = {
                     });
                 }
             }
+
+            //On va appeler l'API pour notifier un utilisateur en fonction du cas
+            //On commence par récuperer le tokenJWT de l'utilisateur
+            const token = req.headers.authorization?.split(' ')[1];
+            if (!token) {
+                return res.status(401).json({ error: 'Accès refusé : non identifié' });
+            }
+            if(param === "status" && value === "Accepted") {
+                await fetch("http://config-services:3007/config/postNotification", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        userId: commande.clientId,
+                        type: "success",
+                        title: "Votre commande a été acceptée",
+                        message: `Votre commande a été acceptée par le restaurant`,
+                    }),
+                }).catch(err => {
+                    console.error("❌ Erreur lors de l'envoi du de la notification :", err);
+                });
+
+            }
+
+            if(param === "status" && value === "In Delivery") {
+                await fetch("http://config-services:3007/config/postNotification", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        userId: commande.clientId,
+                        type: "info",
+                        title: "Votre commande est en cours de livraison",
+                        message: `Votre commande a est en cours de livraison, le livreur arrivera bientôt`,
+                    }),
+                }).catch(err => {
+                    console.error("❌ Erreur lors de l'envoi du de la notification :", err);
+                });
+            }
+
+            if(param === "status" && value === "Completed") {
+                await fetch("http://config-services:3007/config/postNotification", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        userId: commande.clientId,
+                        type: "success",
+                        title: "Bon appetit !",
+                        message: `Votre commande a été livrée avec succès`,
+                    }),
+                }).catch(err => {
+                    console.error("❌ Erreur lors de l'envoi du de la notification :", err);
+                });
+
+            }
+
+
+
 
             // On met à jour la commande
             commande.set(param, value);

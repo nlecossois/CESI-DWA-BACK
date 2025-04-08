@@ -2,7 +2,7 @@
  * @swagger
  * tags:
  *   name: Logs
- *   description: Gestion des logs de connexion et de commande
+ *   description: Gestion des logs de connexion, des commandes et des téléchargements de composants
  */
 
 /**
@@ -326,6 +326,49 @@
  *                               type: string
  *                             uuid_restaurant:
  *                               type: string
+ *       401:
+ *         description: Non identifié
+ *       403:
+ *         description: Accès interdit
+ *       500:
+ *         description: Erreur serveur
+ */
+
+/**
+ * @swagger
+ * /config/postLogDownload:
+ *   post:
+ *     summary: Enregistrer un log de téléchargement
+ *     tags: [Logs]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: string
+ *               componentName:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Log de commande enregistré avec succès
+ *       500:
+ *         description: Erreur lors de l'enregistrement
+ */
+
+/**
+ * @swagger
+ * /config/getLogsDownload:
+ *   get:
+ *     summary: Récupérer tous les logs de téléchargement
+ *     tags: [Logs]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Liste des logs de commande
  *       401:
  *         description: Non identifié
  *       403:

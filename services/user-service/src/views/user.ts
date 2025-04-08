@@ -23,6 +23,29 @@ router.post('/register', async (req: any, res: any) => {
         const userConfig = { name, email, password, type, extra };
         const { user, token } = await addUser(res, userConfig, true, userConfig.type);
 
+        //Si le type du nouvel utilisateur est client:
+        if (user.type === UserType.CLIENT) {
+            //On va envoyer une notification à tous les utilisateurs de type service technique
+            const users = await User.findAll({ where: { type: UserType.TECHNIQUE } });
+            users.forEach(async (user) => {
+                await fetch("http://config-services:3007/config/postNotification", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        userId: user.id,
+                        type: "info",
+                        message: `Un client vient de s'inscrire`,
+                    }),
+                }).catch(err => {
+                    console.error("❌ Erreur lors de l'envoi de la notification :", err);
+                });
+            });
+        }
+
+
         res.status(201).json({ message: "Inscription réussie", user, token });
     } catch (err: any) {
         console.error(err);
@@ -52,6 +75,31 @@ router.post('/login', async (req: any, res: any) => {
       }).catch(err => {
           console.error("❌ Erreur lors de l'envoi du log de connexion :", err);
       });
+
+      //On contrôle le type de l'utilisateur
+      //Si le type est developpeur
+        if (user.type === UserType.DEVELOPPEUR) {
+            //On va envoyer une notification à tous les users de type service technique
+            //On commence par récuperer tous les utilisateurs
+            const users = await User.findAll({ where: { type: UserType.TECHNIQUE } });
+            //On va envoyer une notification à chaque utilisateur
+            users.forEach(async (user) => {
+                await fetch("http://config-services:3007/config/postNotification", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        userId: user.id,
+                        type: "info",
+                        message: `Un developpeur vient de se connecter`,
+                    }),
+                }).catch(err => {
+                    console.error("❌ Erreur lors de l'envoi de la notification :", err);
+                });
+            });
+        }
 
     res.status(201).json({ message: `Connexion réussie`, user, token });
   } catch (err) {
