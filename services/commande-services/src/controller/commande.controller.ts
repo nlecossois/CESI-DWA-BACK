@@ -76,9 +76,41 @@ const logsController = {
     getCommands: async (req: Request, res: Response): Promise<any> => {
         try {
             const commandes = await Commande.findAll();
+
+            //Si status === "Completed" || "Cancelled": on enregistre un log de la commande. On supprime la commande en SQL
+            commandes.forEach(async (commande: any) => {
+                if (commande.status === "Completed" || commande.status === "Cancelled") {
+                    await fetch("http://config-services:3007/config/postLogCommand", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${req.headers.authorization?.split(' ')[1]}`,
+                        },
+                        body: JSON.stringify({
+                            uuid: commande.id,
+                            uuid_client: commande.clientId,
+                            uuid_restaurant: commande.restaurantId,
+                            uuid_livreur: commande.livreurId,
+                            final_status: commande.status,
+                            prixCart: commande.cartPriceHT,
+                            prixTTC: commande.finalPriceTTC,
+                            menus: commande.menus,
+                            articles: commande.articles
+                        }),
+                    }).catch(err => {
+                        console.error("❌ Erreur lors de l'envoi du log de la commande :", err);
+                    });
+                    await Commande.destroy({ where: { id: commande.id } });
+                }
+            });
+
+            //On récupère de nouveau les commandes
+            const commandesActual = await Commande.findAll();
+
+
             res.status(200).send({
                 message: "Commandes récupérées avec succès",
-                data: commandes
+                data: commandesActual
             });
         } catch (error: unknown) {
             if (error instanceof Error) {
@@ -129,7 +161,6 @@ const logsController = {
                     message: "Commande non trouvée"
                 });
             }
-
             //Si le Param est status, on vérifie que la valeur est valide
             if (param === "status") {
                 const validStatuses = ["Pending", "Accepted", "In Delivery", "Completed", "Cancelled"];
@@ -139,6 +170,16 @@ const logsController = {
                     });
                 }
             }
+
+            //Si le param est status, que la value est "Cancelled", on renvoie une erreur si le status actuel est différent de "Pending"
+            if (param === "status" && value === "Cancelled") {
+                if (commande.status !== "Pending") {
+                    return res.status(400).send({
+                        message: "Impossible d'annuler une commande qui n'est pas dans l'état 'Pending'"
+                    });
+                }
+            }
+
 
             //On va appeler l'API pour notifier un utilisateur en fonction du cas
             //On commence par récuperer le tokenJWT de l'utilisateur
