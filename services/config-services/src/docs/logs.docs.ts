@@ -2,7 +2,7 @@
  * @swagger
  * tags:
  *   name: Logs
- *   description: Gestion des logs de connexion et de commande
+ *   description: Gestion des logs de connexion, des commandes et des téléchargements de composants
  */
 
 /**
