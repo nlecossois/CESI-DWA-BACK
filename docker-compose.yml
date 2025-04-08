@@ -33,6 +33,8 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
+    command: [ "mongod", "--quiet", "--logpath", "/dev/null" ]
+
 
   nginx:
     image: nginx:latest
