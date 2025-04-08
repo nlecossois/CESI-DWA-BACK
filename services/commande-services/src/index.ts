@@ -5,6 +5,7 @@ import swaggerUi from "swagger-ui-express";
 import { initializeDatabase, sequelize } from './conf/dbConfig';
 import swaggerOptions from './conf/swaggerConfig';
 import { getHtmlPage } from './conf/htmlPageConfig';
+import registerCommandeRoutes from "./routes/commande.routes";
 
 const app = express();
 const PORT = process.env.COMMANDE_SERVICE_PORT || 3005;
@@ -30,6 +31,8 @@ app.use((req, res, next) => {
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
+registerCommandeRoutes(app);
 
 const startServer = async () => {
     try {
