@@ -1,7 +1,7 @@
 import { Sequelize } from 'sequelize-typescript';
-// import { Restaurant } from '../model/restaurant-model';
-// import { Type } from '../model/type-model';
-// import { RestaurantType } from '../model/restaurantType-model';
+// import { Restaurant } from '../models/restaurant-models';
+// import { Type } from '../models/type-models';
+// import { RestaurantType } from '../models/restaurantType-models';
 
 const dbOption = {
   db: process.env.DB_NAME || "postgres",

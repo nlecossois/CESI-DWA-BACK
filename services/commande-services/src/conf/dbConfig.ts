@@ -1,5 +1,6 @@
 import { Sequelize } from "sequelize-typescript";
 import dotenv from "dotenv";
+import { Commande } from './../models/commande.model.ts';
 
 dotenv.config();
 
@@ -18,7 +19,7 @@ export const sequelize = new Sequelize({
   password: dbOption.password,
   database: dbOption.db,
   port: dbOption.port,
-  models: [],
+  models: [Commande],
   logging: false,  
 });
 

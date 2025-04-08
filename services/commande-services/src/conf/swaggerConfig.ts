@@ -6,7 +6,7 @@ const swaggerOptions: Options = {
     info: {
       title: 'API - Commande Service',
       version: '1.0.0',
-      description: 'Documentation de l\'API',
+      description: 'Documentation de l\'API commande-services',
     },
     servers: [{ url: 'http://localhost:4005' }],
     components: {

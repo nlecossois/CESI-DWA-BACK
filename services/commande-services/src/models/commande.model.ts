@@ -9,16 +9,16 @@ export interface CommandeAttributes {
     status: "Pending" | "Accepted" | "In Delivery" | "Completed" | "Cancelled";
     cartPriceHT: number;
     finalPriceTTC: number | null;
-    menus: object[{
+    menus: Array<{
         uuid: string;
         uuid_restaurant: string;
         amount: number;
-    }];
-    articles: object[{
+    }>;
+    articles: Array<{
         uuid: string;
         uuid_restaurant: string;
         amount: number;
-    }];
+    }>;
 }
 
 export interface CommandeCreationAttributes extends Optional<CommandeAttributes, "id"> {} // Seul id est optionnel
@@ -50,16 +50,16 @@ export class Commande extends Model<CommandeAttributes, CommandeCreationAttribut
     finalPriceTTC!: number | null;
 
     @Column({ type: DataType.JSONB, allowNull: true })
-    menus!: object[{
+    menus!: Array<{
         uuid: string;
         uuid_restaurant: string;
         amount: number;
-    }];
+    }>;
 
     @Column({ type: DataType.JSONB, allowNull: true })
-    articles!: object[{
+    articles!: Array<{
         uuid: string;
         uuid_restaurant: string;
         amount: number;
-    }];
+    }>;
 }
