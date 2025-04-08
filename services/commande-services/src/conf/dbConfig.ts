@@ -1,7 +1,8 @@
-import { Sequelize } from 'sequelize-typescript';
-// import { Restaurant } from '../models/restaurant-models';
-// import { Type } from '../models/type-models';
-// import { RestaurantType } from '../models/restaurantType-models';
+import { Sequelize } from "sequelize-typescript";
+import dotenv from "dotenv";
+import { Commande } from './../models/commande.model.ts';
+
+dotenv.config();
 
 const dbOption = {
   db: process.env.DB_NAME || "postgres",
@@ -12,20 +13,21 @@ const dbOption = {
 };
 
 export const sequelize = new Sequelize({
-  dialect: 'postgres',
+  dialect: "postgres",
   host: dbOption.host,
   username: dbOption.user,
   password: dbOption.password,
   database: dbOption.db,
-  models: [],
+  port: dbOption.port,
+  models: [Commande],
   logging: false,  
 });
 
 export const initializeDatabase = async () => {
   try {
     await sequelize.authenticate();
-    console.log('✅ Connexion à la base de données réussie.');
+    console.log("✅ Connexion à la base de données réussie.");
   } catch (error) {
-    console.error('❌ Erreur de connexion à la base de données:', error);
+    console.error("❌ Erreur de connexion à la base de données:", error);
   }
 };

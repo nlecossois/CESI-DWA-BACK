@@ -1,4 +1,4 @@
-// import { Type } from "../model/type-model";
+// import { Type } from "../models/type-models";
 
 export async function initializeTypes() {
   // const defaultTypes = [
