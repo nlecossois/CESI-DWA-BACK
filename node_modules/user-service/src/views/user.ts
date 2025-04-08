@@ -14,11 +14,15 @@ const SECRET_KEY = process.env.ACCESS_JWT_KEY || "isEmptyJWT_KEY";
 router.post('/register', async (req: any, res: any) => {
     const { name, email, password, type, extra } = req.body;
     try {
-        const userConfig = { name, email, password, type, extra };
-        const user: User = await addUser(res, userConfig, true, userConfig.type);
+        // Vérifier si l'email existe déjà
+        const existingUser = await User.findOne({ where: { email } });
+        if (existingUser) {
+            return res.status(400).json({ error: "Cet email est déjà utilisé" });
+        }
 
-        const token = jwt.sign({ id: user.id, name: user.name, email: user.email, type: user.type }, SECRET_KEY, { expiresIn: '4h' });
-        
+        const userConfig = { name, email, password, type, extra };
+        const { user, token } = await addUser(res, userConfig, true, userConfig.type);
+
         res.status(201).json({ message: "Inscription réussie", user, token });
     } catch (err: any) {
         console.error(err);
@@ -61,7 +65,7 @@ router.post('/create', async (req: any, res: any) => {
         const id = req.user.id;
         const user = await User.findOne({ where: { id } });
         if (!user) return res.status(404).json({ error: 'Utilisateur non trouvé' });
-        const newUser = await addUser(res, { name, email, password, type, extra }, false, user.type);
+        const newUser = await addUser(res, { name, email, password, type, extra }, false, user.type as UserType);
         res.status(201).json({ message: "Utilisateur créé", newUser });
     } catch (err: any) {
         console.error(err);
