@@ -8,7 +8,7 @@ const swaggerOptions: Options = {
       version: '1.0.0',
       description: 'Documentation de l\'API Config Service',
     },
-    servers: [{ url: 'http://localhost:4007' }],
+    servers: [{ url: 'http://localhost' }],
     components: {
       securitySchemes: {
         BearerAuth: {

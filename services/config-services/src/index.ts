@@ -46,6 +46,11 @@ app.use((req, res, next) => {
     next();
 });
 
+app.use(cors({
+    origin: 'http://localhost',  // Ajuste l'URL pour correspondre à ton client Swagger
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
