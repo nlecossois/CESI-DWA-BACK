@@ -153,10 +153,9 @@ const configController = {
         try {
             const address1: Address = req.body.address1;
             const address2: Address = req.body.address2;
-            const address3: Address = req.body.address3;
             const cartValue: number = req.body.cartValue;
 
-            if (!isAddressValid(address1) || !isAddressValid(address2) || !isAddressValid(address3)) {
+            if (!isAddressValid(address1) || !isAddressValid(address2)) {
                 res.status(400).send("Erreur : une ou plusieurs adresses invalides.");
                 return;
             }
@@ -167,12 +166,7 @@ const configController = {
             }
 
             // Appel local à la fonction `getDistance` pour obtenir la distance entre address1 et address2
-            const { distanceRoute: distanceRoute1, distanceVolOiseau: distanceVolOiseau1 } = await configController.getDistance(address1, address2);
-            // Appel local à la fonction `getDistance` pour obtenir la distance entre address2 et address3
-            const { distanceRoute: distanceRoute2, distanceVolOiseau: distanceVolOiseau2 } = await configController.getDistance(address2, address3);
-
-            // Calcul de la distance totale
-            const distanceTotal : number = distanceRoute1 + distanceRoute2;
+            const { distanceRoute: distanceTotal, distanceVolOiseau: distanceVolOiseau1 } = await configController.getDistance(address1, address2);
 
             //On va maintenant récuperer les paramètres dont nous avons besoins
             const deliveryPriceByKm = await paramsController.getParam("deliveryPriceByKm");

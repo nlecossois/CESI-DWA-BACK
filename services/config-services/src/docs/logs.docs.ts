@@ -217,6 +217,7 @@
  *               - uuid_livreur
  *               - uuid_restaurant
  *               - final_status
+ *               - prixCart
  *               - prixTTC
  *               - articles
  *               - menus
@@ -303,6 +304,8 @@
  *                             type: string
  *                       final_status:
  *                         type: string
+ *                       prixCart:
+ *                         type: number
  *                       prixTTC:
  *                         type: number
  *                       articles:

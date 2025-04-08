@@ -37,6 +37,18 @@ router.post('/login', async (req: any, res: any) => {
 
     const token = jwt.sign({ id: user.id, email: user.email, type: user.type }, SECRET_KEY, { expiresIn: '4h' });
 
+      // Enregistrement de la connexion en log via appel API externe
+      await fetch("http://config-services:3007/config/postLogLogin", {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`,
+          },
+          body: JSON.stringify({ uuid: user.id }),
+      }).catch(err => {
+          console.error("❌ Erreur lors de l'envoi du log de connexion :", err);
+      });
+
     res.status(201).json({ message: `Connexion réussie`, user, token });
   } catch (err) {
     res.status(500).json({ error: `Erreur serveur : ${err}` });

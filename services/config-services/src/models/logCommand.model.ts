@@ -17,6 +17,7 @@ export interface ILogCommand extends Document {
     uuid_restaurant: string;
     date: number;
     final_status: string;
+    prixCart: string;
     prixTTC: string;
     articles: IArticle[];
     menus: IMenu[];
@@ -29,6 +30,7 @@ const logCommandSchema = new Schema<ILogCommand>({
     uuid_restaurant: { type: String, required: true },
     date: { type: Number, required: true },
     final_status: { type: String, required: true },
+    prixCart: { type: String, required: true },
     prixTTC: { type: String, required: true },
     articles: [{ type: Object }],
     menus: [{ type: Object }],
