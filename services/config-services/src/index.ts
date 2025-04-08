@@ -11,6 +11,7 @@ import registerConfigRoutes from "./routes/config.routes.ts";
 import registerParamsRoutes from "./routes/params.routes.ts";
 import registerImageRoutes from "./routes/image.routes.ts";
 import registerLogsRoutes from "./routes/logs.routes.ts";
+import registerNotificationRoutes from "./routes/notification.routes.ts";
 import dotenv from "dotenv";
 import paramsController from "./controller/params.controller";  // Import du contrôleur
 import path from 'path';
@@ -41,6 +42,7 @@ registerConfigRoutes(app);
 registerParamsRoutes(app);
 registerImageRoutes(app);
 registerLogsRoutes(app);
+registerNotificationRoutes(app);
 app.use((req, res, next) => {
     console.log("📢 Requête reçue :", req.method, req.originalUrl);
     next();
