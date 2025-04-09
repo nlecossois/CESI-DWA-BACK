@@ -315,6 +315,57 @@ const logsController = {
             const newLogDownload = new LogDownload({ userId, date, componentName });
             await newLogDownload.save();
 
+            const allowedRoles = ['admin'];
+            const token = req.headers.authorization?.split(' ')[1];
+
+            if (!token) {
+                return res.status(401).json({ error: 'Accès refusé : non identifié' });
+            }
+
+            //On va notifier tous les users ayant le type = "technique"
+            //On va commencer par récuperer l'ensemble des utilisateurs via l'api
+            let users: any[] = [];
+
+            try {
+                const response = await fetch("http://user-service:3000/users/", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`,
+                    }
+                });
+
+                if (!response.ok) {
+                    console.error("❌ Erreur HTTP lors de la récupération des utilisateurs :", response.statusText);
+                } else {
+                    users = await response.json();
+                }
+            } catch (err) {
+                console.error("❌ Erreur réseau lors de la récupération des utilisateurs :", err);
+            }
+
+            //On va filtrer les utilisateurs ayant le type = "technique"
+            const techUsers = users.filter((user: any) => user.type === "technique");
+            //On va notifier chaque utilisateur technique
+            techUsers.forEach(async (user: any) => {
+                //On va envoyer la notification
+                await fetch("http://config-services:3007/config/postNotification", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        userId: user.id,
+                        type: "success",
+                        title: "Téléchargement d'un composant !",
+                        message: `Le composant ${componentName} a été téléchargé`,
+                    }),
+                }).catch(err => {
+                    console.error("❌ Erreur lors de l'envoi de la notification :", err);
+                });
+            });
+
             res.status(200).send({
                 message: "🚀 Log de téléchargement enregistré avec succès",
                 data: newLogDownload,

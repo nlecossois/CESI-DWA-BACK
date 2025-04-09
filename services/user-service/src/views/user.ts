@@ -171,14 +171,14 @@ router.post('/create', async (req: any, res: any) => {
 
 router.get('/', async (req: any, res: any) => {
   try {
-    const token = req.headers.authorization?.split(' ')[1];
-    const decoded = jwt.verify(token, SECRET_KEY) as any;
-    const allowedRoles = ['admin'];
-    console.log(decoded)
-
-    if (!allowedRoles.includes(decoded.type)) {
-      return res.status(403).json({ error: 'Accès refusé : privilèges insuffisants' });
-    }
+    // const token = req.headers.authorization?.split(' ')[1];
+    // const decoded = jwt.verify(token, SECRET_KEY) as any;
+    // const allowedRoles = ['admin'];
+    // console.log(decoded)
+    //
+    // if (!allowedRoles.includes(decoded.type)) {
+    //   return res.status(403).json({ error: 'Accès refusé : privilèges insuffisants' });
+    // }
 
     const users = await User.findAll();
     
