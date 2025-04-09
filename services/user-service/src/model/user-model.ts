@@ -7,6 +7,7 @@ export interface UserAttributes {
   name: string;
   email: string;
   password: string;
+  balance: number;
   type: UserType;
 }
 
@@ -25,6 +26,9 @@ export class User extends Model {
 
   @Column({ type: DataType.STRING, allowNull: false, unique: true })
   email!: string;
+
+  @Column({ type: DataType.DECIMAL, allowNull: false, defaultValue: 0 })
+  balance!: number;
 
   @Column({ type: DataType.STRING, allowNull: false })
   password!: string;

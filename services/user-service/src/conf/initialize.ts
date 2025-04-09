@@ -17,6 +17,7 @@ export const createAdminIfNotExists = async () => {
         name: 'Admin',
         email: 'admin@example.com',
         password: password,
+        balance: 0,
         type: UserType.ADMIN,
       });
         console.log("✅ Compte admin créé avec succès");

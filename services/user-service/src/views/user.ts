@@ -20,8 +20,46 @@ router.post('/register', async (req: any, res: any) => {
             return res.status(400).json({ error: "Cet email est déjà utilisé" });
         }
 
-        const userConfig = { name, email, password, type, extra };
+        const balanceTemp = 0;
+        const userConfig = { name, email, balanceTemp, password, type, extra };
         const { user, token } = await addUser(res, userConfig, true, userConfig.type);
+
+        //C'est ici que l'on détermine si il y a eu un parrainage
+        //On vérifie si il y a un email de parrain "parrainEmail" dans le body de la requpete.
+        //Ce champ est facultatif, on va donc le récuperer
+        //On va le stocker dans une variable parrainEmail
+        const parrainEmail = req.body.parrainEmail;
+        //On va vérifier si parrainEmail existe
+        if(parrainEmail) {
+            //On va chercher l'utilisateur possédant cet email et récuperer son id
+            const parrain = await User.findOne({ where: { email: parrainEmail } });
+            //Si le parrain existe on va lui ajouter 5 euros de bonus
+            if (parrain) {
+                //On va lui ajouter 5 euros de bonus
+                const balance: number = 5;
+                await parrain.update({ balance: Number(parrain.balance) + Number(balance) });
+                await user.update({ balance: Number(user.balance) + Number(balance) });
+
+                //Corriger l'envoie de la notification ici
+                //On va envoyer une notification à l'utilisateur
+                await fetch("http://config-services:3007/config/postNotification", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        userId: parrain.id,
+                        type: "info",
+                        title: "Nouveau parrainage !",
+                        message: `Vous avez reçu un bonus de ${balance} euros pour avoir parrainé ${name}`,
+                    }),
+                }).catch(err => {
+                    console.error("❌ Erreur lors de l'envoi de la notification :", err);
+                });
+            }
+        }
+
 
         //Si le type du nouvel utilisateur est client:
         if (user.type === UserType.CLIENT) {
