@@ -241,10 +241,23 @@ const logsController = {
                     console.error("❌ Erreur lors de l'envoi du de la notification :", err);
                 });
 
+
+                await fetch("http://config-services:3007/config/postNotification", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        userId: commande.livreurId,
+                        type: "success",
+                        title: "Commande livrée !",
+                        message: `La commande à bien été livrée`,
+                    }),
+                }).catch(err => {
+                    console.error("❌ Erreur lors de l'envoi du de la notification :", err);
+                });
             }
-
-
-
 
             // On met à jour la commande
             commande.set(param, value);
