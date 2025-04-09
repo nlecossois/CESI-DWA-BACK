@@ -296,3 +296,47 @@
  *       500:
  *         description: Erreur serveur
  */
+
+/**
+ * @swagger
+ * /users/updatePassword/:
+ *   put:
+ *     summary: Mettre à jour le mot de passe d'un utilisateur
+ *     description: Permet de modifier le mot de passe d'un utilisateur spécifique
+ *     tags:
+ *       - Utilisateurs
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - oldPassword
+ *               - newPassword
+ *               - confirmPassword
+ *               - uuid
+ *             properties:
+ *               oldPassword:
+ *                 type: string
+ *                 example: "password123"
+ *               newPassword:
+ *                 type: string
+ *                 example: "newpassword123"
+ *               confirmPassword:
+ *                 type: string
+ *                 example: "newpassword123"
+ *               uuid:
+ *                 type: string
+ *                 format: uuid
+ *                 example: "550e8400-e29b-41d4-a716-446655440000"
+ *     responses:
+ *       200:
+ *         description: Mot de passe mis à jour
+ *       404:
+ *         description: Utilisateur non trouvé
+ *       500:
+ *         description: Erreur serveur
+ */
