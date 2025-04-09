@@ -6,6 +6,12 @@ import { RestaurantType } from "./restaurantType-model"
 export interface Restaurant {
   id: string;
   ownerId: string;
+  logo: string,
+  restaurantName: string,
+  type: string,
+  address:string,
+  siret: string,
+  codePostal: string,
 }
 
 export interface RestaurantAttributes extends Optional<Restaurant, "id"> {}
@@ -17,6 +23,21 @@ export class Restaurant extends Model {
 
   @Column({ type: DataType.UUID, defaultValue: DataType.UUIDV4, allowNull: false })
   ownerId!: string;
+
+  @Column({ type: DataType.STRING, allowNull: true })
+  logo!: string;
+
+  @Column({ type: DataType.STRING, allowNull: false })
+  name!: string;
+
+  @Column({ type: DataType.STRING, allowNull: false })
+  address!: string;
+
+  @Column({ type: DataType.STRING, allowNull: false })
+  siret!: string;
+
+  @Column({ type: DataType.STRING, allowNull: false })
+  codePostal!: string;
 
   // Relation avec la table de liaison
   @BelongsToMany(() => Type, () => RestaurantType)
