@@ -8,6 +8,7 @@ export interface UserAttributes {
   email: string;
   password: string;
   balance: number;
+  banned: boolean;
   type: UserType;
 }
 
@@ -29,6 +30,9 @@ export class User extends Model {
 
   @Column({ type: DataType.DECIMAL, allowNull: false, defaultValue: 0 })
   balance!: number;
+
+  @Column({ type: DataType.BOOLEAN, allowNull: false, defaultValue: false })
+  banned!: boolean;
 
   @Column({ type: DataType.STRING, allowNull: false })
   password!: string;

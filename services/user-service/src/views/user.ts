@@ -21,7 +21,8 @@ router.post('/register', async (req: any, res: any) => {
         }
 
         const balanceTemp = 0;
-        const userConfig = { name, email, balanceTemp, password, type, extra };
+        const banned : boolean = false;
+        const userConfig = { name, email, balanceTemp, password, banned, type, extra };
         const { user, token } = await addUser(res, userConfig, true, userConfig.type);
 
         //C'est ici que l'on détermine si il y a eu un parrainage
@@ -159,7 +160,9 @@ router.post('/create', async (req: any, res: any) => {
         const id = decoded.id;
 
         const user = await User.findOne({ where: { id } });
-        const userConfig = { name, email, password, type, extra };
+        const balance: number = 0;
+        const banned: boolean = false;
+        const userConfig = { name, email, password, balance, banned, type, extra };
         if (!user) return res.status(404).json({ error: 'Utilisateur non trouvé' });
         const newUser = await addUser(res, userConfig, false, user.type as UserType);
         res.status(201).json({ message: "Utilisateur créé", newUser });
@@ -233,6 +236,51 @@ router.delete('/:id', async (req: any, res: any) => {
     console.error(err);
     res.status(500).json({ error: `Erreur serveur : ${err}` });
   }
+});
+
+router.put('/ban/:id', async (req: any, res: any) => {
+    const { id } = req.params;
+    const { banned } = req.body;
+    try {
+        if(!id || !banned){
+            return res.status(400).json({ message: "L'id et le statut de bannissement sont requis (id, banned)" });
+        }
+        const allowedRoles = ['admin', 'commercial'];
+        const token = req.headers.authorization?.split(' ')[1];
+        if (!token) {
+            return res.status(401).json({error: 'Accès refusé : non identifié'});
+        }
+        const decoded = jwt.verify(token, SECRET_KEY) as any;
+        //On va vérifier si l'utilisateur connécté est admin ou si il s'agit de l'utilisateur qui fait la demande
+        if (!allowedRoles.includes(decoded.type)) {
+            return res.status(403).json({ error: 'Accès refusé : privilèges insuffisants' });
+        }
+
+        //On récupère l'utilisateur
+        const user = await User.findOne({
+            where: { id } as any
+        });
+        if (!user) {
+            return res.status(404).json({ message: "Utilisateur non trouvé" });
+        }
+        //On vérifie que l'utilisateur banni possède le type "restaurant", "client" ou "livreur"
+        if (user.type !== UserType.RESTAURANT && user.type !== UserType.CLIENT && user.type !== UserType.LIVREUR) {
+            return res.status(400).json({ message: "L'utilisateur ne peut pas être banni" });
+        }
+        //On met à jour le statut de bannissement de l'utilisateur
+        await user.update({ banned });
+        //On renvoie l'utilisateur mis à jour
+        return res.status(201).json({ message: 'Utilisateur mis à jour : ', user });
+
+    } catch (err: unknown) {
+        if(err instanceof Error){
+            console.error("Erreur lors de la mise à jour du solde:", err.message);
+            res.status(500).json({ message: "Erreur lors de la mise à jour du solde:" + err.message });
+        } else {
+            console.error("Erreur inconnue lors de la mise à jour du solde.");
+            res.status(500).json({message: "Erreur inconnue lors de la mise à jour du solde"});
+        }
+    }
 });
 
 router.put('/:id', async (req: any, res: any) => {

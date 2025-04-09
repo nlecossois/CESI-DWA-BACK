@@ -258,3 +258,41 @@
  *       500:
  *         description: Erreur serveur
  */
+
+/**
+ * @swagger
+ * /users/ban/{id}:
+ *   put:
+ *     summary: Modifier la suspension d'un utilisateur
+ *     description: Permet de modifier la suspension d'un utilisateur spécifique
+ *     tags:
+ *       - Utilisateurs
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - banned
+ *             properties:
+ *               banned:
+ *                 type: boolean
+ *                 example: true
+ *     responses:
+ *       200:
+ *         description: Etat de suspension mis à jour
+ *       404:
+ *         description: Utilisateur non trouvé
+ *       500:
+ *         description: Erreur serveur
+ */
