@@ -110,10 +110,20 @@ router.post('/login', async (req: any, res: any) => {
 router.post('/create', async (req: any, res: any) => {
     const { name, email, password, type, extra } = req.body;
     try {
-        const id = req.user.id;
+        // Récupération du token
+        const token = req.headers.authorization?.split(' ')[1];
+        if (!token) {
+            return res.status(401).json({ error: 'Accès refusé : non identifié' });
+        }
+
+        // Décodage du token
+        const decoded = jwt.verify(token, SECRET_KEY) as any;
+        const id = decoded.id;
+
         const user = await User.findOne({ where: { id } });
+        const userConfig = { name, email, password, type, extra };
         if (!user) return res.status(404).json({ error: 'Utilisateur non trouvé' });
-        const newUser = await addUser(res, { name, email, password, type, extra }, false, user.type as UserType);
+        const newUser = await addUser(res, userConfig, false, user.type as UserType);
         res.status(201).json({ message: "Utilisateur créé", newUser });
     } catch (err: any) {
         console.error(err);
