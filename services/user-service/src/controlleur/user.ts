@@ -111,7 +111,7 @@ export async function addUser(res: any, userConfig: UserConfig, isNew: boolean =
             name: userConfig.name,
             email: userConfig.email,
             password: hashedPassword,
-            type: userType
+            type: userConfig.type
         });
 
         // Créer le token après la création de l'utilisateur
