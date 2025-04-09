@@ -11,14 +11,12 @@ const livreurController = {
 
     createLivreur: async (req: Request, res: Response) => {
         try {
-            const { userId, phone, vehicule, gpsLongitude, gpsLatitude } = req.body;
+            const { userId, phone, vehicule } = req.body;
 
             const livreur = await Livreur.create({
                 userId,
                 phone,
                 vehicule,
-                gpsLongitude,
-                gpsLatitude
             });
 
             res.status(201).json(livreur);
@@ -186,8 +184,6 @@ const livreurController = {
             const { phone, vehicule, gpsLongitude, gpsLatitude } = req.body;
             livreur.phone = phone;
             livreur.vehicule = vehicule;
-            livreur.gpsLongitude = gpsLongitude;
-            livreur.gpsLatitude = gpsLatitude;
 
             await livreur.save();
 
