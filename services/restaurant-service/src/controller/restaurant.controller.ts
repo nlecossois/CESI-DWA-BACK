@@ -197,7 +197,7 @@ const restaurantController = {
     getAllTypes: async (req: Request, res: Response): Promise<void> => {
         try {
             const types = await Type.findAll({
-                attributes: ['id', 'name']
+                attributes: ['id', 'name', 'icon']
             });
 
             if (types.length === 0) {
