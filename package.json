@@ -23,5 +23,18 @@
     "make": "^0.0.0",
     "multer": "^1.4.5-lts.2",
     "save": "^2.9.0"
-  }
+  },
+  "version": "1.0.0",
+  "description": "CESI Dépôt projet DWA - Back",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nlecossois/CESI-DWA-BACK.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nlecossois/CESI-DWA-BACK/issues"
+  },
+  "homepage": "https://github.com/nlecossois/CESI-DWA-BACK#readme"
 }
