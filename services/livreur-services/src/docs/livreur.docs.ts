@@ -15,8 +15,6 @@
  *         - userId
  *         - phone
  *         - vehicule
- *         - gpsLongitude
- *         - gpsLatitude
  *       properties:
  *         userId:
  *           type: string
@@ -25,24 +23,16 @@
  *           type: string
  *         vehicule:
  *           type: string
- *         gpsLongitude:
- *           type: number
- *         gpsLatitude:
- *           type: number
  *       example:
  *         userId: "9c84ee64-bdf3-4046-a4b5-0c1086f3d8cf"
  *         phone: "+33612345678"
  *         vehicule: "scooter"
- *         gpsLongitude: 2.3522
- *         gpsLatitude: 48.8566
  *     Livreur:
  *       type: object
  *       required:
  *         - userId
  *         - phone
  *         - vehicule
- *         - gpsLongitude
- *         - gpsLatitude
  *       properties:
  *         id:
  *           type: string
@@ -54,17 +44,11 @@
  *           type: string
  *         vehicule:
  *           type: string
- *         gpsLongitude:
- *           type: number
- *         gpsLatitude:
- *           type: number
  *       example:
  *         id: "7e9b2df1-8e7d-4d73-bc58-a3f1d0e48b01"
  *         userId: "9c84ee64-bdf3-4046-a4b5-0c1086f3d8cf"
  *         phone: "+33612345678"
  *         vehicule: "scooter"
- *         gpsLongitude: 2.3522
- *         gpsLatitude: 48.8566
  */
 
 /**
