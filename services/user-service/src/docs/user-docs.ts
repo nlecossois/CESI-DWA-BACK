@@ -204,6 +204,44 @@
 
 /**
  * @swagger
+ * /users/{id}:
+ *   put:
+ *     summary: Modifier le solde d'un utilisateur
+ *     description: Permet de modifier le solde d'un utilisateur spécifique
+ *     tags:
+ *       - Utilisateurs
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - newSolde
+ *             properties:
+ *               newSolde:
+ *                 type: string
+ *                 example: "214"
+ *     responses:
+ *       200:
+ *         description: Solde mise à jour
+ *       404:
+ *         description: Utilisateur non trouvé
+ *       500:
+ *         description: Erreur serveur
+ */
+
+/**
+ * @swagger
  * /users:
  *   get:
  *     summary: Récupérer la liste des utilisateurs
