@@ -1,5 +1,6 @@
 # CESI-DWA-BACK
-CESI Dépôt projet DWA - Back
+CESI Dépôt projet DWA - Back  
+Le projet n'est pas disponnible en production. Certaines fonctionnalitées ne sont donc pas parfaitement optimisées pour un environnement de production comme par exemple l'absence de load-balancing ou la gestion des images.
 
 ## Installation
 Après avoir pull le projet sur un répertoire en local, il vous faudra installer make à la racine de votre projet
@@ -9,28 +10,25 @@ Ensuite, vous devez créer un fichier ".env" à la racine de votre projet afin d
 
 Enfin, vous pourez lancer la commande pour initialiser et lancer votre projet.
 
-## Liste des commandes (JetBrains PhpStorm)
-- **make up** (initialise / lance toutes les images docker du projet)
-- **make down** (eteint toutes les images docker du projet)
+## Liste des commandes
+- **docker-compose up** (initialise / lance toutes les images docker du projet)
+- **docker-compose down** (eteint toutes les images docker du projet)
  /!\ Bien exécuter cette commande avant d'éteindre Docker, votre IDE, de push ou d'éteindre votre poste /!\
-- **make dev** (initialise / lance toutes les images docker du projet et lance les environnement de développement)
-- **make delete** (A utiliser après un make down uniquement, permet de supprimer les conteneurs pour une réinitialisation propre)
-- **make restart** (Redémarre l'ensemble des conteneurs)
-- **make reset** (Réinitialise les conteneurs)
+- **docker system prune -af --volumes** (réinitialise l'ensemble des conteneurs du projet)
 
-## Liste des commandes (Cursor / VS Code)
-- **npm run up** (initialise / lance toutes les images docker du projet)
-- **npm run down** (eteint toutes les images docker du projet)
- /!\ Bien exécuter cette commande avant d'éteindre Docker, votre IDE, de push ou d'éteindre votre poste /!\
-- **npm run dev** (initialise / lance toutes les images docker du projet et lance les environnement de développement)
-- **npm run delete** (A utiliser après un make down uniquement, permet de supprimer les conteneurs pour une réinitialisation propre)
-- **npm run restart** (Redémarre l'ensemble des conteneurs)
-- **npm run reset** (Réinitialise les conteneurs)
 
 ## Utilisation de l'API
 En local l'api s'appelle via **http://localhost/**
+En cas de soucis avec la base de données, connectez-vous à l'adminer:  
+- url: http://localhost:8080/
+- Système : PostegreSQL
+- Serveur : db
+- Utilisateur : postgres
+- Mot de passe : password  
+Au moment de la connexion à la base de données, choisir la base nommé "postgres". Supprimez alors toutes les tables et lancez les commandes de down, de prune et de up pour bien tout relancer proprement.
 
-## Description du fonctionnement des différents services. La documentation des API de chaque service est disponnible dans son swagger dédié
+## Description du fonctionnement des différents services.
+La documentation des API de chaque service est disponnible dans son swagger dédié. Pour acceder aux swagger, il faut avoir lancer le projet.  
 **articles-services**:
 - Route d'utilisation : http://localhost/articles/
 - Port : 3004
