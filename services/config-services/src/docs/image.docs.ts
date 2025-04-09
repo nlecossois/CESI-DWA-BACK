@@ -21,11 +21,10 @@
  *           schema:
  *             type: object
  *             required:
- *               - newImage
+ *               - base64
  *             properties:
- *               newImage:
+ *               base64:
  *                 type: string
- *                 format: binary
  *     responses:
  *       200:
  *         description: Image uploadée avec succès
@@ -37,13 +36,10 @@
  *                 message:
  *                   type: string
  *                   example: 🚀 Image uploadée avec succès
- *                 uuid:
+ *                 imageId:
  *                   type: string
  *                   format: uuid
  *                   example: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
- *                 url:
- *                   type: string
- *                   example: "http://localhost:3000/public/images/3fa85f64-5717-4562-b3fc-2c963f66afa6.jpg"
  *       400:
  *         description: Aucune image fournie
  *       500:
@@ -54,7 +50,7 @@
  * @swagger
  * /config/getImage:
  *   post:
- *     summary: Récupère une image à partir de son UUID
+ *     summary: Récupère une image à partir de son imageId
  *     tags:
  *       - Image
  *     requestBody:
@@ -64,9 +60,9 @@
  *           schema:
  *             type: object
  *             required:
- *               - uuid
+ *               - imageId
  *             properties:
- *               uuid:
+ *               imageId:
  *                 type: string
  *                 format: uuid
  *                 example: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
@@ -78,7 +74,7 @@
  *             schema:
  *               type: object
  *               properties:
- *                 dataUrl:
+ *                 base64:
  *                   type: string
  *                   example: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD..."
  *       400:

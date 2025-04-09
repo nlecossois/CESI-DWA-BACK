@@ -1,77 +1,35 @@
-import express, { Request, Response } from 'express';
-import multer from 'multer';
-import fs from 'fs';
-import path from 'path';
+import { Request, Response } from 'express';
+import Image from '../models/image.model';
 import { v4 as uuidv4 } from 'uuid';
-import mime from 'mime-types';
-
-const app = express();
-
-// Crée un dossier pour stocker les images si ce n'est pas déjà fait
-const imageDirectory = path.join(__dirname, '..', '..', 'public', 'images'); // Remonte deux niveaux pour stocker les images
-
-if (!fs.existsSync(imageDirectory)) {
-    fs.mkdirSync(imageDirectory, { recursive: true });
-}
-
-// Définition des extensions autorisées
-const allowedExtensions = ['image/jpeg', 'image/png', 'image/webp'];
-
-// Configure Multer pour stocker les fichiers dans un dossier temporaire
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, imageDirectory); // Dossier où on veut stocker les images
-    },
-    filename: (req, file, cb) => {
-        const imageUUID = uuidv4(); // Génère un UUID pour chaque image
-        const extension = path.extname(file.originalname).toLowerCase(); // Obtenir l'extension du fichier
-        cb(null, `${imageUUID}${extension}`); // Nom du fichier : UUID.extension
-    }
-});
-
-// Vérifie les types de fichiers autorisés
-const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
-    if (allowedExtensions.includes(file.mimetype)) {
-        cb(null, true); // Si le type est autorisé
-    } else {
-        cb(null, false); // Ne pas accepter le fichier sans lancer d'erreur
-    }
-};
-
-const upload = multer({ storage, fileFilter });
-
-app.use('/public/images', express.static(path.join(__dirname, '..', '..', 'images')));
 
 // Contrôleur pour le téléchargement de l'image
 const imageController = {
     postImage: async (req: Request, res: Response): Promise<any> => {
         try {
-            // On vérifie si une image a bien été fournie
-            if (!req.file) {
-                return res.status(400).send("Aucune image fournie.");
+
+            //On récupère le champ base64 de la requête
+            const { base64 } = req.body;
+            if (!base64) {
+                return res.status(400).send({
+                    message: "Aucune image fournie",
+                });
             }
+            //On génère un uuidv4
+            const imageId = uuidv4();
 
-            // Extraire l'extension du fichier
-            const fileExtension = path.extname(req.file.originalname);
+            //On créé une nouvelle image à importer dans la base de données Mongo
+            const newImage = new Image({
+                imageId: imageId,
+                base64: base64,
+            });
 
-            // Extraire l'UUID du nom du fichier sans l'extension
-            const imageUUID = req.file.filename.split('.')[0];
-
-            // Construire le nouveau nom de fichier avec l'UUID et l'extension
-            const newFileName = `${imageUUID}${fileExtension}`;
-
-            // Renommer le fichier avec l'extension
-            const oldPath = path.join(imageDirectory, req.file.filename);
-            const newPath = path.join(imageDirectory, newFileName);
-
-            // Renommer le fichier sur le système de fichiers
-            fs.renameSync(oldPath, newPath);
-
-            // Retourner la réponse avec l'URL et le UUID
+            //On sauvegarde l'image dans la base de données
+            await newImage.save();
+            console.log("✅ Image sauvegardée avec succès");
+            //On retourne l'imageId en réponse
             return res.status(200).send({
-                message: "🚀 Image uploadée avec succès",
-                uuid: imageUUID,
-                url: `http://localhost:3000/public/images/${newFileName}`,
+                message: "Image sauvegardée avec succès",
+                imageId: imageId,
             });
         } catch (error: unknown) {
             if (error instanceof Error) {
@@ -91,41 +49,32 @@ const imageController = {
 
     getImage: async (req: Request, res: Response): Promise<any> => {
         try {
-            // On récupère l'UUID dans le corps de la requête
-            const { uuid } = req.body;
+            //On récupère le champ imageId de la requête
+            const { imageId } = req.body;
+            if (!imageId) {
+                return res.status(400).send({
+                    message: "Aucun imageId fourni",
+                });
+            }
+            //On recherche l'image dans la base de données
+            const image = await Image.findOne({ imageId: imageId });
 
-            // Vérifier que l'UUID a été fourni dans le corps de la requête
-            if (!uuid) {
-                return res.status(400).send("Aucun UUID fourni.");
+
+            if (!image) {
+                return res.status(404).send({
+                    message: "Image non trouvée",
+                });
             }
 
-            // On vérifie si le fichier existe avec l'UUID dans le répertoire des images
-            const imagePath = fs.readdirSync(imageDirectory).find(file => file.startsWith(uuid));
 
-            // Si aucun fichier correspondant n'est trouvé
-            if (!imagePath) {
-                console.log("❌ Aucune image trouvée avec l'UUID :", uuid, "dans le répertoire des images.");
-                console.log(imageDirectory + " " + imagePath + " " + fs.readdirSync(imageDirectory));
-                return res.status(404).send("Image non trouvée avec l'uuid: " + uuid);
-            }
 
-            // On construit le chemin complet du fichier
-            const filePath = path.join(imageDirectory, imagePath);
+            //On retourne l'image en base64
+            console.log("✅ Image récupérée avec succès");
+            return res.status(200).send({
+                message: "Image récupérée avec succès",
+                image: image.base64,
+            });
 
-            // Détecter le type MIME de l'image
-            const mimeType = mime.lookup(filePath) || 'application/octet-stream';
-
-            // Lire l'image en buffer
-            const buffer = fs.readFileSync(filePath);
-
-            // Convertir le buffer en chaîne Base64
-            const base64String = buffer.toString('base64');
-
-            // Construire la Data URL (incluant le type MIME et les données Base64)
-            const dataUrl = `data:${mimeType};base64,${base64String}`;
-
-            // Renvoyer la Data URL dans la réponse
-            return res.send({ dataUrl });
 
         } catch (error: unknown) {
             // Gestion des erreurs globales
