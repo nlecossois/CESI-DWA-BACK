@@ -235,6 +235,53 @@ router.delete('/:id', async (req: any, res: any) => {
   }
 });
 
+router.put('/:id', async (req: any, res: any) => {
+    const { id } = req.params;
+    const { newSolde } = req.body;
+    try {
+        //On contrôle la présence de l'id et de newSolde dans le body de la requête
+        if (!id || !newSolde) {
+            return res.status(400).json({ message: "L'id et le nouveau solde sont requis (id, newSolde)" });
+        }
+
+        const allowedRoles = ['admin'];
+        const token = req.headers.authorization?.split(' ')[1];
+
+        if (!token) {
+            return res.status(401).json({ error: 'Accès refusé : non identifié' });
+        }
+
+        const decoded = jwt.verify(token, SECRET_KEY) as any;
+
+        //On va vérifier si l'utilisateur connécté est admin ou si il s'agit de l'utilisateur qui fait la demande
+        if (decoded.uuid !== id && !allowedRoles.includes(decoded.type)) {
+            return res.status(403).json({ error: 'Accès refusé : privilèges insuffisants' });
+        }
+
+        //On récupère l'utilisateur
+        const user = await User.findOne({
+            where: { id } as any
+        });
+        if (!user) {
+            return res.status(404).json({ message: "Utilisateur non trouvé" });
+        }
+
+        //On met à jour le solde de l'utilisateur
+        await user.update({ balance: newSolde });
+
+        return res.status(201).json({ message: 'Solde mis à jour : ', newSolde });
+
+    } catch (err: unknown) {
+        if(err instanceof Error){
+            console.error("Erreur lors de la mise à jour du solde:", err.message);
+            res.status(500).json({ message: "Erreur lors de la mise à jour du solde:" + err.message });
+        } else {
+            console.error("Erreur inconnue lors de la mise à jour du solde.");
+            res.status(500).json({message: "Erreur inconnue lors de la mise à jour du solde"});
+        }
+    }
+});
+
 router.put('/updatePassword', async (req: any, res: any) => {
     
     const { oldPassword, newPassword, confirmPassword, uuid } = req.body;
