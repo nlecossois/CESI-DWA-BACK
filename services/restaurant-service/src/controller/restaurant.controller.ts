@@ -6,27 +6,54 @@ const restaurantController = {
 
     createRestaurant: async (req: Request, res: Response): Promise<void> => {
         try {
-            const { ownerId, logo, restaurantName, type, address, siret, codePostal } = req.body;
+            const { ownerId, logo, restaurantName, address, siret, codePostal, types } = req.body;
 
-            if (!logo || !restaurantName || !type || !address || !siret || !codePostal) {
-                res.status(400).json({ error: "Tous les champs sont requis." });
+            if (!restaurantName || !address || !siret || !codePostal) {
+                res.status(400).json({ error: "Les champs restaurantName, address, siret et codePostal sont requis." });
                 return;
             }
 
             const newRestaurant = await Restaurant.create({
+                ownerId,
                 logo,
                 restaurantName,
-                type,
                 address,
                 siret,
                 codePostal,
             });
 
-            res.status(201).json(newRestaurant);
+            // Si des types sont spécifiés, on les associe au restaurant
+            if (types && Array.isArray(types)) {
+                try {
+                    const typeInstances = await Type.findAll({
+                        where: { id: types }
+                    });
+                    await newRestaurant.$set('types', typeInstances);
+                } catch (error) {
+                    console.error("Erreur lors de l'association des types:", error);
+                    // On continue même si l'association des types échoue
+                }
+            }
+
+            // On récupère le restaurant avec ses types associés
+            const restaurantWithTypes = await Restaurant.findOne({
+                where: { id: newRestaurant.id },
+                include: [{
+                    model: Type,
+                    through: { attributes: [] }
+                }]
+            });
+            
+            res.status(201).json(restaurantWithTypes);
         } catch (error: unknown) {
+            console.error("Erreur détaillée lors de la création du restaurant:", error);
             if (error instanceof Error) {
-                console.error("Erreur lors de la création du restaurant :", error.message);
-                res.status(500).json({ error: "Erreur serveur : " + error.message });
+                console.error("Message d'erreur:", error.message);
+                console.error("Stack trace:", error.stack);
+                res.status(500).json({ 
+                    error: "Erreur serveur : " + error.message,
+                    details: error.stack
+                });
             } else {
                 res.status(500).json({ error: "Erreur serveur inconnue." });
             }
@@ -43,7 +70,7 @@ const restaurantController = {
                 include: [
                     {
                         model: Type,
-                        attributes: ["id", "logo", "name", "address", "siret"],
+                        attributes: ["id", "name", "icon"],
                         through: { attributes: [] },
                     },
                 ],
@@ -71,7 +98,7 @@ const restaurantController = {
                 include: [
                     {
                         model: Type,
-                        attributes: ["id", "logo", "name", "address", "siret"],
+                        attributes: ["id", "name", "icon"],
                         through: { attributes: [] },
                     },
                 ],
@@ -160,6 +187,28 @@ const restaurantController = {
         } catch (error: unknown) {
             if (error instanceof Error) {
                 console.error("Erreur lors de la suppression du restaurant :", error.message);
+                res.status(500).json({ error: "Erreur serveur : " + error.message });
+            } else {
+                res.status(500).json({ error: "Erreur serveur inconnue." });
+            }
+        }
+    },
+
+    getAllTypes: async (req: Request, res: Response): Promise<void> => {
+        try {
+            const types = await Type.findAll({
+                attributes: ['id', 'name']
+            });
+
+            if (types.length === 0) {
+                res.status(404).json({ error: "Aucun type trouvé." });
+                return;
+            }
+
+            res.status(200).json(types);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                console.error("Erreur lors de la récupération des types :", error.message);
                 res.status(500).json({ error: "Erreur serveur : " + error.message });
             } else {
                 res.status(500).json({ error: "Erreur serveur inconnue." });

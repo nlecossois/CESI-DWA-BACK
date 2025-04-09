@@ -68,10 +68,11 @@ async function createRestaurant(userId: string, extra: any, authToken: string | 
     try {
         const restaurantData = {
             ownerId: userId,
-            name: extra.name ?? `${extra.name}'s Restaurant`,
+            restaurantName: extra.name ?? `${extra.name}'s Restaurant`,
             address: extra.address ?? "Adresse à définir",
             siret: extra.siret ?? "SIRET à définir",
             logo: extra.logo ?? null,
+            codePostal: extra.codePostal ?? "00000",
             types: extra.types ?? []
         };
 
@@ -84,10 +85,11 @@ async function createRestaurant(userId: string, extra: any, authToken: string | 
         // Retourner uniquement les données nécessaires
         return {
             id: response.data.id,
-            name: response.data.name,
+            name: response.data.restaurantName,
             address: response.data.address,
             siret: response.data.siret,
-            logo: response.data.logo
+            logo: response.data.logo,
+            types: response.data.types
         };
     } catch (error: any) {
         console.error("Erreur lors de la création du restaurant:", error.message);

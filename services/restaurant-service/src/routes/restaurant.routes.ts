@@ -7,4 +7,5 @@ export default function registerRestaurantRoutes(app: Application) {
     app.get("/getAllRestaurants", restaurantController.getAllRestaurants);
     app.put("/restaurants/:id", restaurantController.updateRestaurant);
     app.delete("/restaurants/:id", restaurantController.deleteRestaurant);
+    app.get("/types", restaurantController.getAllTypes);
 }

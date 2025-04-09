@@ -6,6 +6,7 @@ import { RestaurantType } from "./restaurantType-model";
 export interface Type {
   id: string;
   name: string;
+  icon: string;
 }
 
 export interface TypeAttributes extends Optional<Type, "id"> {}
@@ -15,8 +16,11 @@ export class Type extends Model {
   @Column({ primaryKey: true, type: DataType.UUID, defaultValue: DataType.UUIDV4 })
   declare id: string;
 
-  @Column({ type: DataType.STRING, defaultValue: DataType.STRING, allowNull: false })
+  @Column({ type: DataType.STRING, allowNull: false })
   name!: string;
+
+  @Column({ type: DataType.STRING, allowNull: false })
+  icon!: string;
 
   @BelongsToMany(() => Restaurant, () => RestaurantType)
   declare restaurants: Restaurant[];
