@@ -1,4 +1,4 @@
-import restaurantController from "../controller/restaurant";
+import restaurantController from "../controller/restaurant.controller";
 import {Application} from "express";
 
 export default function registerRestaurantRoutes(app: Application) {

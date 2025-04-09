@@ -6,7 +6,7 @@ const restaurantController = {
 
     createRestaurant: async (req: Request, res: Response): Promise<void> => {
         try {
-            const { ownerId, logo, restaurantName, type, address, siret } = req.body;
+            const { ownerId, logo, restaurantName, type, address, codePostal, siret } = req.body;
 
             if (!logo || !restaurantName || !type || !address || !siret) {
                 res.status(400).json({ error: "Tous les champs sont requis." });
@@ -19,6 +19,7 @@ const restaurantController = {
                 type,
                 address,
                 siret,
+                codePostal,
             });
 
             res.status(201).json(newRestaurant);

@@ -1,13 +1,12 @@
 import express from "express";
 import cors from "cors";
-import restaurants from "./views/restaurant"
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import { initializeDatabase, sequelize } from './conf/dbConfig'; 
 import swaggerOptions from './conf/swaggerConfig'; 
 import { getHtmlPage } from './conf/htmlPageConfig'; 
 import { initializeTypes } from "./conf/init";
-import registerRestaurantRoutes from "./views/restaurant.routes";
+import registerRestaurantRoutes from "./routes/restaurant.routes";
 
 const app = express();
 const port = process.env.RESTAURANT_SERVICE_PORT || 3001;

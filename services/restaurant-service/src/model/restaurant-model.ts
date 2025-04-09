@@ -11,6 +11,7 @@ export interface Restaurant {
   type: string,
   address:string,
   siret: string,
+  postalCode: string,
 }
 
 export interface RestaurantAttributes extends Optional<Restaurant, "id"> {}
@@ -35,7 +36,12 @@ export class Restaurant extends Model {
   @Column({ type: DataType.STRING, allowNull: false })
   siret!: string;
 
+  @Column({ type: DataType.STRING, allowNull: false })
+  postalCode!: string;
+
   // Relation avec la table de liaison
   @BelongsToMany(() => Type, () => RestaurantType)
   declare types: Type[];
+
+
 }
