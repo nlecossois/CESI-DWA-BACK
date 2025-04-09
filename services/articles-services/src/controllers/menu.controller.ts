@@ -15,19 +15,6 @@ export async function getMenus(restaurantId: string) {
     }
 }
 
-export async function getArticlesByMenu(restaurantId: string, menuId: string) {
-    try {
-        const menu = await Menu.findOne({
-            where: { id: menuId, restaurantId },
-            include: [Article]
-        });
-        return menu?.articles || [];
-    } catch (error) {
-        console.error("Erreur lors de la récupération des articles du menu:", error);
-        throw error;
-    }
-}
-
 export async function addMenu(menuData: any) {
     try {
         const menuId = uuidv4();

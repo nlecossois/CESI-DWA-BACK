@@ -16,17 +16,7 @@ router.get('/articles/articles/getall', async (req: any, res: any) => {
     }
 });
 
-//Récupérer les articles d'un menu d'un restaurant
-router.get('/articles/articles/getmenu', async (req: any, res: any) => {
-    try {
-        const { restaurantId, menuId } = req.query;
-        const articles = await menuController.getArticlesByMenu(restaurantId, menuId);
-        res.json(articles);
-    } catch (err: any) {
-        console.error(err);
-        res.status(500).json({ error: `Erreur serveur : ${err.message}` });
-    }
-});
+
 
 router.post('/articles/articles/add', async (req: any, res: any) => {
     try {

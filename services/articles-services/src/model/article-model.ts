@@ -1,8 +1,9 @@
 import { Table, Column, Model, DataType, BelongsToMany } from "sequelize-typescript";
 import { Optional } from "sequelize";
 import { Menu } from "./menu-model";
+import { MenuArticle } from "./menu-article";
 
-export interface ArticleAttributes {
+export interface Article {
   id: string;
   nom: string;
   description: string;
@@ -11,7 +12,7 @@ export interface ArticleAttributes {
   restaurantId: string;
 }
 
-export interface ArticleCreationAttributes extends Optional<ArticleAttributes, "id"> {}
+export interface ArticleAttributes extends Optional<Article, "id"> {}
 
 @Table({ tableName: "articles", timestamps: true })
 export class Article extends Model {
@@ -33,6 +34,7 @@ export class Article extends Model {
   @Column({ type: DataType.UUID, allowNull: false })
   restaurantId!: string;
 
-  @BelongsToMany(() => Menu, { through: 'menu_articles' })
-  menus?: Menu[];
+  // Relation avec la table de liaison
+  @BelongsToMany(() => Menu, () => MenuArticle)
+  declare menus: Menu[];
 }

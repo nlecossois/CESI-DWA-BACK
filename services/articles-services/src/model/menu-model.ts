@@ -1,15 +1,16 @@
 import { Table, Column, Model, DataType, BelongsToMany } from "sequelize-typescript";
 import { Optional } from "sequelize";
 import { Article } from "./article-model";
+import { MenuArticle } from "./menu-article";
 
-export interface MenuAttributes {
+export interface Menu {
   id: string;
   nom: string;
   prix: number;
   restaurantId: string;
 }
 
-export interface MenuCreationAttributes extends Optional<MenuAttributes, "id"> {}
+export interface MenuAttributes extends Optional<Menu, "id"> {}
 
 @Table({ tableName: "menus", timestamps: true })
 export class Menu extends Model {
@@ -25,6 +26,6 @@ export class Menu extends Model {
   @Column({ type: DataType.UUID, allowNull: false })
   restaurantId!: string;
 
-  @BelongsToMany(() => Article, { through: 'menu_articles' })
-  articles?: Article[];
+  @BelongsToMany(() => Article, () => MenuArticle)
+  declare articles: Article[];
 } 
