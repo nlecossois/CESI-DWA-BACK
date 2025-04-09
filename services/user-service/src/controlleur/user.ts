@@ -16,10 +16,27 @@ interface UserConfig {
     authToken?: string;
 }
 
-async function createClient(userId: string) {
+async function createClient(userId: string, extra: any, authToken: string | undefined) {
+    if (!authToken) {
+        throw new Error("Token d'authentification requis pour créer un livreur");
+    }
+
     try {
-        const response = await axios.post(BASE_URLS.CLIENT, { userId });
+        const clientData = {
+            userId: userId,
+            address: extra.address ?? "Adresse à définir",
+            codePostal: extra.codePostal ?? "Code postal à définir",
+            phone: extra.phone ?? "Numéro de téléphone à définir"
+        };
+
+        const response = await axios.post(BASE_URLS.CLIENT, clientData, {
+            headers: {
+                'Authorization': `Bearer ${authToken}`
+            }
+        });
+
         return response.data;
+
     } catch (error) {
         console.error("Erreur lors de la création du client:", error);
         throw new Error("Impossible de créer le client");
@@ -125,7 +142,7 @@ export async function addUser(res: any, userConfig: UserConfig, isNew: boolean =
         if (isNew) {
             switch (userType) {
                 case UserType.CLIENT:
-                    await createClient(userId);
+                    await createClient(userId, userConfig.extra, token);
                     break;
                 case UserType.LIVREUR:
                     await createLivreur(userId, userConfig.extra, token);
