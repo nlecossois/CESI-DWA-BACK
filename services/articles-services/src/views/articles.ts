@@ -5,7 +5,7 @@ import * as menuController from "../controllers/menu.controller";
 const router = express.Router();
 
 //Récuperer les articles d'un restaurant
-router.get('/articles/articles/getall', async (req: any, res: any) => {
+router.get('/articles/getall', async (req: any, res: any) => {
     try {
         const { uuid: restaurantId } = req.query;
         const articles = await articleController.getArticles(restaurantId);
@@ -17,11 +17,10 @@ router.get('/articles/articles/getall', async (req: any, res: any) => {
 });
 
 
-
-router.post('/articles/articles/add', async (req: any, res: any) => {
+router.post('/articles/add', async (req: any, res: any) => {
     try {
-        const { email, name, description, price, type } = req.body;
-        const article = await articleController.addArticle({ name, description, price, type });
+        const { email, nom, description, prix, type, restaurantId } = req.body;
+        const article = await articleController.addArticle({ nom, description, prix, type, restaurantId });
         res.status(201).json({ message: "Article créé", article });
     } catch (err: any) {
         console.error(err);
@@ -29,7 +28,7 @@ router.post('/articles/articles/add', async (req: any, res: any) => {
     }
 });
 
-router.delete('/articles/articles/delete', async (req: any, res: any) => {
+router.delete('/articles/delete', async (req: any, res: any) => {
     try {
         const { email, uuid: articleId } = req.body;
         const article = await articleController.deleteArticle(articleId);
@@ -40,7 +39,7 @@ router.delete('/articles/articles/delete', async (req: any, res: any) => {
     }
 });
 
-router.post('/articles/articles/edit', async (req: any, res: any) => {
+router.post('/articles/edit', async (req: any, res: any) => {
     try {
         const { email, uuid: articleId, field, value } = req.body;
         const article = await articleController.editArticle(articleId, field, value);
@@ -66,8 +65,8 @@ router.get('/articles/menus/getall', async (req: any, res: any) => {
 //Créer un menu pour un restaurant
 router.post('/articles/menus/add', async (req: any, res: any) => {
     try {
-        const { email, name, description, price, type } = req.body;
-        const menu = await menuController.addMenu({ name, description, price, type });
+        const { email, nom, prix, restaurantId } = req.body;
+        const menu = await menuController.addMenu({ nom, prix, restaurantId });
         res.status(201).json({ message: "Menu créé", menu });
     } catch (err: any) {
         console.error(err);
