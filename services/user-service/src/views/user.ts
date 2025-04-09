@@ -14,11 +14,15 @@ const SECRET_KEY = process.env.ACCESS_JWT_KEY || "isEmptyJWT_KEY";
 router.post('/register', async (req: any, res: any) => {
     const { name, email, password, type, extra } = req.body;
     try {
-        const userConfig = { name, email, password, type, extra };
-        const user: User = await addUser(res, userConfig, true, userConfig.type);
+        // Vérifier si l'email existe déjà
+        const existingUser = await User.findOne({ where: { email } });
+        if (existingUser) {
+            return res.status(400).json({ error: "Cet email est déjà utilisé" });
+        }
 
-        const token = jwt.sign({ id: user.id, name: user.name, email: user.email, type: user.type }, SECRET_KEY, { expiresIn: '4h' });
-        
+        const userConfig = { name, email, password, type, extra };
+        const { user, token } = await addUser(res, userConfig, true, userConfig.type);
+
         res.status(201).json({ message: "Inscription réussie", user, token });
     } catch (err: any) {
         console.error(err);
@@ -61,7 +65,7 @@ router.post('/create', async (req: any, res: any) => {
         const id = req.user.id;
         const user = await User.findOne({ where: { id } });
         if (!user) return res.status(404).json({ error: 'Utilisateur non trouvé' });
-        const newUser = await addUser(res, { name, email, password, type, extra }, false, user.type);
+        const newUser = await addUser(res, { name, email, password, type, extra }, false, user.type as UserType);
         res.status(201).json({ message: "Utilisateur créé", newUser });
     } catch (err: any) {
         console.error(err);
@@ -70,69 +74,122 @@ router.post('/create', async (req: any, res: any) => {
 });
 
 router.get('/', async (req: any, res: any) => {
-  try {
-    const token = req.headers.authorization?.split(' ')[1];
-    const decoded = jwt.verify(token, SECRET_KEY) as any;
-    const allowedRoles = ['admin'];
-    console.log(decoded)
+    try {
+        const token = req.headers.authorization?.split(' ')[1];
+        const decoded = jwt.verify(token, SECRET_KEY) as any;
+        const allowedRoles = ['admin'];
+        console.log(decoded)
 
-    if (!allowedRoles.includes(decoded.type)) {
-      return res.status(403).json({ error: 'Accès refusé : privilèges insuffisants' });
+        if (!allowedRoles.includes(decoded.type)) {
+            return res.status(403).json({ error: 'Accès refusé : privilèges insuffisants' });
+        }
+
+        const users = await User.findAll();
+
+        if (users.length === 0) return res.status(404).json({ error: 'Aucun utilisateur trouvé' });
+
+        res.json(users);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: `Erreur serveur : ${err}` });
     }
-
-    const users = await User.findAll();
-    
-    if (users.length === 0) return res.status(404).json({ error: 'Aucun utilisateur trouvé' });
-    
-    res.json(users);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: `Erreur serveur : ${err}` });
-  }
 });
 
 // Routes avec paramètres (placées en dernier)
 router.get('/:id', async (req: any, res: any) => {
-  const { id } = req.params;
-  try {
-    const user = await User.findOne({ where: { id } });    
-    if (!user) {
-      return res.status(404).json({ error: 'Utilisateur non trouvé' });
+    const { id } = req.params;
+    try {
+        const user = await User.findOne({ where: { id } });
+        if (!user) {
+            return res.status(404).json({ error: 'Utilisateur non trouvé' });
+        }
+        res.json(user);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: `Erreur serveur : ${err}` });
     }
-    res.json(user);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: `Erreur serveur : ${err}` });
-  }
 });
 
 router.delete('/:id', async (req: any, res: any) => {
-  const { id } = req.params;
+    const { id } = req.params;
 
-  try {
-    const user = await User.findOne({ where: { id } });    
+    try {
+        const user = await User.findOne({ where: { id } });
 
-    if (!user) return res.status(404).json({ error: 'Utilisateur non trouvé' });
+        if (!user) return res.status(404).json({ error: 'Utilisateur non trouvé' });
 
-    if (user.type === UserType.RESTAURANT) {
-      try {
-              const response = await axios.post(BASE_URLS.RESTAURANT, {
-                  ownerId: user.id,
-              });
-              return response.data;
-          } catch (error) {
-              console.error("Erreur lors de la supression du restaurant:", error);
-              throw new Error("Impossible de supprimer le restaurant");
-          }
+        if (user.type === UserType.RESTAURANT) {
+            try {
+                const response = await axios.post(BASE_URLS.RESTAURANT, {
+                    ownerId: user.id,
+                });
+                return response.data;
+            } catch (error) {
+                console.error("Erreur lors de la supression du restaurant:", error);
+                throw new Error("Impossible de supprimer le restaurant");
+            }
+        }
+
+        await user.destroy()
+
+        res.json(user);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: `Erreur serveur : ${err}` });
+    }
+});
+
+router.put('/updatePassword', async (req: any, res: any) => {
+
+    const { oldPassword, newPassword, confirmPassword, uuid } = req.body;
+
+    // Récupération du token
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+        return res.status(401).json({ error: 'Accès refusé : non identifié' });
     }
 
-    await user.destroy()
+    try {
+        // Décode le token pour vérifier les droits
+        const decoded = jwt.verify(token, SECRET_KEY) as any;
+        const allowedRoles = ['admin'];
 
-    res.json(user);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: `Erreur serveur : ${err}` });
-  }
+        // Vérifie si l'utilisateur est admin ou si c'est son propre compte
+        if (decoded.id !== uuid && !allowedRoles.includes(decoded.type)) {
+            return res.status(403).json({ error: 'Accès refusé : privilèges insuffisants' });
+        }
+
+        // Vérifie que les nouveaux mots de passe correspondent
+        if (newPassword !== confirmPassword) {
+            return res.status(400).json({ error: 'Les nouveaux mots de passe ne correspondent pas' });
+        }
+
+        // Vérifie que l'utilisateur existe
+        const user = await User.findOne({ where: { id: uuid } });
+        if (!user) {
+            return res.status(404).json({ error: 'Utilisateur non trouvé' });
+        }
+
+        // Vérifie que l'ancien mot de passe est correct
+        const match = await bcrypt.compare(oldPassword, user.password);
+        if (!match) {
+            return res.status(401).json({ error: 'Ancien mot de passe incorrect' });
+        }
+
+        // Hash le nouveau mot de passe
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        // Met à jour le mot de passe
+        await user.update({ password: hashedPassword });
+
+        return res.status(201).json({ message: 'Mot de passe mis à jour avec succès' });
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            return res.status(500).json({ error: `Erreur serveur : ${error.message}` });
+        } else {
+            return res.status(500).json({ error: 'Erreur serveur : erreur inconnue' });
+        }
+    }
 });
 
 export default router;

@@ -4,6 +4,7 @@ import { User } from "../model/user-model";
 import { v4 as uuidv4 } from "uuid";
 import { UserType } from "../model/user-type";
 import { BASE_URLS } from "../conf/route";
+import jwt from "jsonwebtoken";
 
 interface UserConfig {
     name: string;
@@ -11,6 +12,7 @@ interface UserConfig {
     password: string;
     type: string;
     extra?: Record<string, any>;
+    authToken?: string;
 }
 
 async function createClient(userId: string) {
@@ -33,59 +35,86 @@ async function createLivreur(userId: string) {
     }
 }
 
-async function createRestaurant(userId: string, extra: any) {
+async function createRestaurant(userId: string, extra: any, authToken: string | undefined) {
+    if (!authToken) {
+        throw new Error("Token d'authentification requis pour créer un restaurant");
+    }
+
     try {
-        const response = await axios.post(BASE_URLS.RESTAURANT, {
+        console.log(extra)
+        const restaurantData = {
             ownerId: userId,
-            name: extra.name ?? `${extra.name}'s Restaurant`,
+            restaurantName: extra.restaurantName ?? `${extra.restaurantName}'s Restaurant`,
             address: extra.address ?? "Adresse à définir",
-            phone: extra.phone ?? "Numéro de téléphone à définir",
-            types: extra.types ?? [],
+            siret: extra.siret ?? "SIRET à définir",
+            logo: extra.logo ?? null,
+            types: extra.types ?? []
+        };
+
+        const response = await axios.post(`${BASE_URLS.RESTAURANT}/createRestaurant`, restaurantData, {
+            headers: {
+                'Authorization': `Bearer ${authToken}`
+            }
         });
-        return response.data;
-    } catch (error) {
-        console.error("Erreur lors de la création du restaurant:", error);
-        throw new Error("Impossible de créer le restaurant");
+
+        // Retourner uniquement les données nécessaires
+        return {
+            id: response.data.id,
+            name: response.data.name,
+            address: response.data.address,
+            siret: response.data.siret,
+            logo: response.data.logo
+        };
+    } catch (error: any) {
+        console.error("Erreur lors de la création du restaurant:", error.message);
+        throw new Error(`Impossible de créer le restaurant: ${error.message}`);
     }
 }
 
-const typeFactory: Record<string, (userId: string, extra?: any) => Promise<any>> = {
+const typeFactory: Record<string, (userId: string, extra?: any, authToken?: string) => Promise<any>> = {
     [UserType.CLIENT]: createClient,
     [UserType.LIVREUR]: createLivreur,
-    [UserType.RESTAURANT]: createRestaurant,
+    [UserType.RESTAURANT]: createRestaurant
 };
 
-export async function addUser(
-    res: any, 
-    userConfig: UserConfig,
-    isRegister: boolean,
-    requestingUser: string,
-): Promise<User> {
+export async function addUser(res: any, userConfig: UserConfig, isNew: boolean = false, userType: UserType = UserType.CLIENT): Promise<{ user: User; token: string }> {
+    try {
+        const hashedPassword = await bcrypt.hash(userConfig.password, 10);
+        const userId = uuidv4();
 
-    const { name, email, password, type, extra } = userConfig;
+        const user = await User.create({
+            id: userId,
+            name: userConfig.name,
+            email: userConfig.email,
+            password: hashedPassword,
+            type: userType
+        });
 
-    const existingUser = await User.findOne({ where: { email } });
+        // Créer le token après la création de l'utilisateur
+        const token = jwt.sign({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            type: user.type
+        }, process.env.ACCESS_JWT_KEY || "isEmptyJWT_KEY", { expiresIn: '4h' });
 
-    if (existingUser) {
-        return res.status(400).json({ error: "Cet email est déjà utilisé" });
-    }
-
-    if (!isRegister && requestingUser !== UserType.ADMIN) {
-        return res.status(403).json({ error: "Accès interdit. Seuls les administrateurs peuvent créer des utilisateurs." });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const newUser = await User.create({ id: uuidv4(), name, email, password: hashedPassword, type });
-
-    const createTypeSpecific = typeFactory[type];
-    if (createTypeSpecific) {
-        try {
-            await createTypeSpecific(newUser.id, extra);
-        } catch (error: any) {
-            return res.status(500).json({ error: error.message });
+        if (isNew) {
+            switch (userType) {
+                case UserType.CLIENT:
+                    await createClient(userId);
+                    break;
+                case UserType.LIVREUR:
+                    await createLivreur(userId);
+                    break;
+                case UserType.RESTAURANT:
+                    await createRestaurant(userId, userConfig.extra, token);
+                    break;
+            }
         }
-    }
 
-    return newUser;
+        return { user, token };
+    } catch (error: any) {
+        console.error("Erreur lors de la création de l'utilisateur:", error);
+        throw error;
+    }
 }

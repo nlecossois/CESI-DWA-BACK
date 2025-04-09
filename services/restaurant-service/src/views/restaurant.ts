@@ -2,6 +2,7 @@ import express from "express";
 import { Restaurant } from "../model/restaurant-model";
 import { Type } from "../model/type-model";
 
+
 const router = express.Router();
 
 router.get('/types', async (req: any, res: any) => {
