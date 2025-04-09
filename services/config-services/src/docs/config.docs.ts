@@ -7,42 +7,6 @@
 
 /**
  * @swagger
- * components:
- *   schemas:
- *     Address:
- *       type: object
- *       required:
- *         - numero
- *         - rue
- *         - code postal
- *         - ville
- *         - pays
- *       properties:
- *         numero:
- *           type: string
- *           example: "10"
- *         rue:
- *           type: string
- *           example: "Rue de la paix"
- *         code postal:
- *           type: string
- *           example: "75002"
- *         ville:
- *           type: string
- *           example: "Paris"
- *         pays:
- *           type: string
- *           example: "France"
- *         coordinates:
- *           type: array
- *           description: Coordonnées GPS de l'adresse (non recquis dans la requête)
- *           items:
- *             type: number
- *           example: [2.3522, 48.8566]
- */
-
-/**
- * @swagger
  * /config/getDistance:
  *   post:
  *     summary: Calcule la distance entre deux adresses
@@ -59,9 +23,9 @@
  *               - address2
  *             properties:
  *               address1:
- *                 $ref: '#/components/schemas/Address'
+ *                 type: string
  *               address2:
- *                 $ref: '#/components/schemas/Address'
+ *                 type: string
  *     responses:
  *       200:
  *         description: Distances calculées avec succès
@@ -74,15 +38,12 @@
  *                   type: string
  *                   example: "Données extraites avec succès"
  *                 address1:
- *                   $ref: '#/components/schemas/Address'
+ *                   type: string
  *                 address2:
- *                   $ref: '#/components/schemas/Address'
+ *                   type: string
  *                 distanceRoute:
  *                   type: number
  *                   example: 12.34
- *                 distanceVolOiseau:
- *                   type: number
- *                   example: 10.56
  *       400:
  *         description: Une ou plusieurs adresses sont invalides
  */
@@ -106,11 +67,9 @@
  *               - cartValue
  *             properties:
  *               address1:
- *                 $ref: '#/components/schemas/Address'
+ *                 type: string
  *               address2:
- *                 $ref: '#/components/schemas/Address'
- *               address3:
- *                 $ref: '#/components/schemas/Address'
+ *                 type: string
  *               cartValue:
  *                 type: number
  *                 example: 42.5
