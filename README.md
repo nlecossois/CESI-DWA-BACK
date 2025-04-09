@@ -32,48 +32,48 @@ La documentation des API de chaque service est disponible dans son Swagger dédi
 - Route d'utilisation : http://localhost/articles/
 - Port : 3004
 - Swagger : http://localhost:3004/swagger
-> Description :
+> Description : Gestion des menus et des articles.
   
 **auth-service**:
 - Route d'utilisation : http://localhost/auth/
 - Port : 3006
-> Description : 
+> Description : Gestion du système d'authentification.
 
 **client-services**:
 - Route d'utilisation : http://localhost/client/
 - Port : 3002
 - Swagger : http://localhost:3002/swagger
-> Description :
+> Description : Gestion des utilisateurs de type client.
 
 **commande-services**:
 - Route d'utilisation : http://localhost/client/
 - Port : 3005
 - Swagger : http://localhost:3005/swagger
-> Description :
+> Description : Gestion des commandes.
 
 **config-services**:
 - Route d'utilisation : http://localhost/config/
 - Port : 3007
 - Swagger : http://localhost:3007/swagger
-> Description :
+> Description : Gestion des paramètres, des notifications, des logs, des images et des calculs de distance et de prix.
 
 **livreur-services**:
 - Route d'utilisation : http://localhost/livreur/
 - Port : 3003
 - Swagger : http://localhost:3003/swagger
-> Description :
+> Description : Gestion des utilisateurs de type livreur.
 
 **restaurant-services**:
 - Route d'utilisation : http://localhost/restaurants/
 - Port : 3001
 - Swagger : http://localhost:3001/swagger
-> Description :
+> Description : Gestion des utilisateurs de type restaurant.
 
 **user-services**:
 - Route d'utilisation : http://localhost/users/
 - Port : 3000
 - Swagger : http://localhost:3000/swagger
-> Description :
+> Description : Gestion des utilisateurs et de l'authentification (login/register).
   
   
   
