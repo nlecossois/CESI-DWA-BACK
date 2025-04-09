@@ -6,5 +6,5 @@ export default function registerLivreurRoutes(app: Application) {
     app.get("/livreur/getAll", livreurController.getAll);
     app.get("/livreur/getLivreurByUserId/:uuid", livreurController.getLivreurByUserId);
     app.delete("/livreur/deleteLivreurByUserId/:uuid", livreurController.deleteLivreurByUserId);
-    app.post("/livreur/updateLivreurByUserId/:uuid", livreurController.updateLivreurByUserId)
+    app.post("/livreur/updateLivreurByUserId/:uuid", livreurController.updateLivreurByUserId);
 }
