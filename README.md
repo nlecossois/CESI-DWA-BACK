@@ -29,3 +29,55 @@ Enfin, vous pourez lancer la commande pour initialiser et lancer votre projet.
 
 ## Utilisation de l'API
 En local l'api s'appelle via **http://localhost/**
+
+## Description du fonctionnement des différents services. La documentation des API de chaque service est disponnible dans son swagger dédié
+**articles-services**:
+- Route d'utilisation : http://localhost/articles/
+- Port : 3004
+- Swagger : http://localhost:3004/swagger
+> Description :
+  
+**auth-service**:
+- Route d'utilisation : http://localhost/auth/
+- Port : 3006
+> Description : 
+
+**client-services**:
+- Route d'utilisation : http://localhost/client/
+- Port : 3002
+- Swagger : http://localhost:3002/swagger
+> Description :
+
+**commande-services**:
+- Route d'utilisation : http://localhost/client/
+- Port : 3005
+- Swagger : http://localhost:3005/swagger
+> Description :
+
+**config-services**:
+- Route d'utilisation : http://localhost/config/
+- Port : 3007
+- Swagger : http://localhost:3007/swagger
+> Description :
+
+**livreur-services**:
+- Route d'utilisation : http://localhost/livreur/
+- Port : 3003
+- Swagger : http://localhost:3003/swagger
+> Description :
+
+**restaurant-services**:
+- Route d'utilisation : http://localhost/restaurants/
+- Port : 3001
+- Swagger : http://localhost:3001/swagger
+> Description :
+
+**user-services**:
+- Route d'utilisation : http://localhost/users/
+- Port : 3000
+- Swagger : http://localhost:3000/swagger
+> Description :
+  
+  
+  
+  
