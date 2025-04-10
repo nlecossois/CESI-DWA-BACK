@@ -87,6 +87,8 @@
  *                 type: string
  *               restaurantId:
  *                 type: string
+ *               logo:
+ *                 type: string
  *     responses:
  *       201:
  *         description: Article créé avec succès.
@@ -182,6 +184,8 @@
  *                   description:
  *                     type: string
  *                     example: "Pizza traditionnelle avec tomate, mozzarella et basilic"
+ *                   logo:
+ *                     type: string
  *                   prix:
  *                     type: number
  *                     format: float
@@ -221,6 +225,8 @@
  *                   nom:
  *                     type: string
  *                     example: "Menu du Jour"
+ *                   logo:
+ *                     type: string
  *                   prix:
  *                     type: number
  *                     format: float
@@ -252,6 +258,8 @@
  *               restaurantId:
  *                 type: string
  *               ownerId:
+ *                 type: string
+ *               logo:
  *                 type: string
  *     responses:
  *       201:
