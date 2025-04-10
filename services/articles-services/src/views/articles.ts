@@ -20,7 +20,7 @@ router.get('/articles/getall', async (req: any, res: any) => {
 router.post('/articles/add', async (req: any, res: any) => {
     try {
         const { ownerId, nom, description, prix, type, restaurantId, logo } = req.body;
-        const article = await articleController.addArticle({ nom, description, prix, type, restaurantId, ownerId, logo }, req, res);
+        const article = await articleController.addArticle({ nom, description, prix, type, restaurantId, ownerId, logo: logo || null }, req, res);
         res.status(201).json({ message: "Article créé", article });
     } catch (err: any) {
         console.error(err);
@@ -66,7 +66,7 @@ router.get('/menus/getall', async (req: any, res: any) => {
 router.post('/menus/add', async (req: any, res: any) => {
     try {
         const { nom, prix, restaurantId, ownerId, logo } = req.body;
-        const menu = await menuController.addMenu({ nom, prix, restaurantId, ownerId, logo }, req, res);
+        const menu = await menuController.addMenu({ nom, prix, restaurantId, ownerId, logo: logo || null }, req, res);
         res.status(201).json({ message: "Menu créé", menu });
     } catch (err: any) {
         console.error(err);
