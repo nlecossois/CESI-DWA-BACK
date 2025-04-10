@@ -164,7 +164,7 @@ router.post('/create', async (req: any, res: any) => {
         const banned: boolean = false;
         const userConfig = { name, email, password, balance, banned, type, extra };
         if (!user) return res.status(404).json({ error: 'Utilisateur non trouvé' });
-        const newUser = await addUser(res, userConfig, true, user.type as UserType);
+        const newUser = await addUser(res, userConfig, true, userConfig.type);
         res.status(201).json({ message: "Utilisateur créé", newUser });
     } catch (err: any) {
         console.error(err);
