@@ -30,7 +30,10 @@ En cas de soucis avec la base de données, connectez-vous à l'adminer:
 - Serveur : db
 - Utilisateur : postgres
 - Mot de passe : password  
-Au moment de la connexion à la base de données, choisir la base nommée "postgres". Supprimez alors toutes les tables et lancez les commandes de down, de prune et de up pour bien tout relancer proprement.  
+Au moment de la connexion à la base de données, choisir la base nommée "postgres". Supprimez alors toutes les tables et lancez les commandes de down, de prune et de up pour bien tout relancer proprement.
+Si une ou plusieurs tables refusent de se supprimer (c'est généralement le cas de la table restaurants ou de la table articles), exécutez les requêtes SQL suivantes:
+- DROP TABLE restaurants CASCADE
+- DROP TABLE articles CASCADE
 
 **Installation des dépendances**:
 En cas d'erreurs liées à vos dépendances, réinitialisez vos conteneurs. Si cela vous arrive pendant le développement d'un nouveau service, pensez à bien agrémenter vos fichiers package.json et package-lock.json avec vos dépendances dans les "dependencies" et "dev-dependencies" en ajoutant bien le décorateur "@types/" avant le nom de votre dépendance, afin qu'au premier démarrage du conteneur, toutes vos dépendances soient correctement initialisées. Enfin, réinitialisez vos conteneurs. N'oubliez pas d'ajouter vos fichiers package.JSON et package-lock.json à votre commit afin que le problème ne se répercute pas sur les autres contributeurs du projet.
