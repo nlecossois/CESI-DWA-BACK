@@ -129,6 +129,10 @@
  *                     properties:
  *                       uuid:
  *                         type: string
+ *                       name:
+ *                         type: string
+ *                       type:
+ *                         type: string
  *                       date:
  *                         type: object
  *                         properties:
@@ -379,6 +383,38 @@
  *     responses:
  *       200:
  *         description: Liste des logs de commande
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       userId:
+ *                         type: string
+ *                         description: UUID de l'utilisateur
+ *                       date:
+ *                         type: object
+ *                         properties:
+ *                           day:
+ *                             type: string
+ *                           month:
+ *                             type: string
+ *                           year:
+ *                             type: string
+ *                           hour:
+ *                             type: string
+ *                           minute:
+ *                             type: string
+ *                           second:
+ *                             type: string
+ *
+ *
  *       401:
  *         description: Non identifié
  *       403:
