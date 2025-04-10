@@ -4,9 +4,9 @@ const swaggerOptions: Options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'API Express avec Swagger',
+      title: 'API - Restaurant Service',
       version: '1.0.0',
-      description: 'Documentation de l\'API',
+      description: 'Documentation de l\'API restaurant-services',
     },
     servers: [{ url: 'http://localhost:4001' }],
     components: {
