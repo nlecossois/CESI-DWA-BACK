@@ -12,9 +12,9 @@ const logsController = {
     //Enregistrer une connexion en log
     postLogLogin: async (req: Request, res: Response) => {
         try {
-            const { uuid } = req.body;
+            const { uuid, name, type } = req.body;
             const date : number = Date.now();
-            const newLogLogin = new LogLogin({ uuid, date });
+            const newLogLogin = new LogLogin({ uuid, date, name, type });
             await newLogLogin.save();
             res.status(200).send({
                 message: "🚀 Log de connexion enregistré avec succès",
@@ -69,6 +69,8 @@ const logsController = {
                 return {
                     uuid: log.uuid,
                     date: decomposedDate,
+                    name: log.name,
+                    type: log.type,
                 };
             });
 
