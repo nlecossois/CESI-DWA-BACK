@@ -66,11 +66,10 @@ const restaurantController = {
 
     getRestaurant: async (req: Request, res: Response): Promise<any> => {
         try {
-            const { ownerId } = req.params;
+            const { id } = req.params;
 
             const restaurant = await Restaurant.findOne({
-                where: { ownerId },
-
+                where: { id },
             });
 
             if (!restaurant) {
