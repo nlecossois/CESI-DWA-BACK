@@ -25,6 +25,10 @@
  *           type: number
  *           format: float
  *           description: "Prix total de la commande hors taxes"
+ *         finalDeliveryTTC:
+ *           type: number
+ *           format: float
+ *           description: "Prix de livraison final, toutes taxes comprises (optionnel)"
  *         finalPriceTTC:
  *           type: number
  *           format: float
@@ -66,6 +70,34 @@
  * tags:
  *   name: Commande
  *   description: API pour la gestion des commandes
+ */
+
+/**
+ * @swagger
+ * /commande/getCommand/{uuid}:
+ *   get:
+ *     tags:
+ *       - Commande
+ *     parameters:
+ *       - in: path
+ *         name: uuid
+ *         required: true
+ *         description: ID de la commande
+ *         schema:
+ *           type: string
+ *     summary: "Récupérer une commande"
+ *     description: "Cette route permet de récupérer une commande."
+ *     responses:
+ *       200:
+ *         description: "Commande récupérée avec succès"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Commande'
+ *       500:
+ *         description: "Erreur interne du serveur"
  */
 
 /**

@@ -70,6 +70,10 @@ const restaurantController = {
 
             const restaurant = await Restaurant.findOne({
                 where: { id },
+                include: [{
+                    model: Type,
+                    through: { attributes: [] }, // Ne pas inclure les colonnes de la table de liaison
+                }],
             });
 
             if (!restaurant) {
@@ -77,7 +81,11 @@ const restaurantController = {
                 return;
             }
 
-            res.status(200).json(restaurant);
+            // On transforme les résultats pour garantir que le restaurant a une clé `types`, même vide
+            const restaurantData = restaurant.toJSON();
+            restaurantData.types = restaurantData.types || []; // Si pas de types, on envoie une liste vide
+
+            res.status(200).json(restaurantData);
         } catch (error: unknown) {
             if (error instanceof Error) {
                 console.error("Erreur lors de la récupération du restaurant :", error.message);
@@ -90,16 +98,29 @@ const restaurantController = {
 
     getAllRestaurants: async (req: Request, res: Response): Promise<any> => {
         try {
-            const restaurants = await Restaurant.findAll();
+            const restaurants = await Restaurant.findAll({
+                include: [{
+                    model: Type,
+                    through: { attributes: [] }, // Ne pas inclure les colonnes de la table de liaison
+                }],
+            });
 
-            res.status(200).json(restaurants);
+            // On transforme les résultats pour garantir que chaque restaurant a une clé `types`, même vide
+            const result = restaurants.map(restaurant => {
+                const restaurantData = restaurant.toJSON(); // Convertir en objet plain
+                restaurantData.types = restaurantData.types || []; // Si pas de types, on envoie une liste vide
+                return restaurantData;
+            });
+
+            res.status(200).json(result);
 
         } catch (error) {
+            // Gestion des erreurs
             if (error instanceof Error) {
                 console.error("Erreur lors de la récupération des restaurants :", error.message);
-                res.status(500).json({ error: "Erreur serveur : " + error.message });
+                return res.status(500).json({ error: "Erreur serveur : " + error.message });
             } else {
-                res.status(500).json({ error: "Erreur serveur inconnue." });
+                return res.status(500).json({ error: "Erreur serveur inconnue." });
             }
         }
     },

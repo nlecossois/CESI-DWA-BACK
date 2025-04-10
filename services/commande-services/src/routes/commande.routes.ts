@@ -8,4 +8,5 @@ export default function registerCommandeRoutes(app: Application) {
     app.get("/commande/stats/getTransactionnal", commandeController.getTransactional);
     app.get("/commande/stats/getGlobalCA", commandeController.getGlobalCA);
     app.get("/commande/stats/restaurant/:uuid", commandeController.getRestaurantStats);
+    app.get("/commande/getCommand/:uuid", commandeController.getCommandById);
 }
