@@ -23,6 +23,12 @@
  *               uuid:
  *                 type: string
  *                 description: UUID de l'utilisateur
+ *               name:
+ *                 type: string
+ *                 description: Nom de l'utilisateur
+ *               type:
+ *                 type: string
+ *                 description: Type de l'utilisateur (admin, livreur, client)
  *     responses:
  *       200:
  *         description: Log de connexion enregistré avec succès
@@ -63,6 +69,10 @@
  *                     type: object
  *                     properties:
  *                       uuid:
+ *                         type: string
+ *                       name:
+ *                         type: string
+ *                       type:
  *                         type: string
  *                       date:
  *                         type: object
