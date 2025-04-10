@@ -1,6 +1,7 @@
 # CESI-DWA-BACK
 CESI Dépôt projet DWA - Back  
-Le projet n'est pas disponible en production. Certaines fonctionnalités ne sont donc pas parfaitement optimisées pour un environnement de production, comme par exemple l'absence de load-balancing ou la gestion des images.
+Le projet n'est pas disponible en production. Certaines fonctionnalités ne sont donc pas parfaitement optimisées pour un environnement de production, comme par exemple l'absence de load-balancing ou la gestion des images. Nous aurions pu utiliser un cloud comme Google ou AWS, ou bien une application dédiée comme Kubernetes, afin de gérer la répartition de la charge, l'instanciation de multiples services et la redirection vers chacun d'eux, comme détaillé sur le schéma d'architecture du projet.
+
 
 ## Installation
 Après avoir pull le projet sur un répertoire en local, il vous faudra installer make à la racine de votre projet
