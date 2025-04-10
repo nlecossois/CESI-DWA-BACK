@@ -248,18 +248,7 @@ const logsController = {
     //Récuperer toutes les logs de commandes (contrôle de rôle)
     getLogsCommand: async (req: Request, res: Response): Promise<any> => {
         try {
-            const allowedRoles = ['admin', 'livreur'];
-            const token = req.headers.authorization?.split(' ')[1];
-
-            if (!token) {
-                return res.status(401).json({ error: 'Accès refusé : non identifié' });
-            }
-
-            const decoded = jwt.verify(token, SECRET_KEY) as any;
-
-            if (!allowedRoles.includes(decoded.type)) {
-                return res.status(403).json({ error: 'Accès refusé : privilèges insuffisants' });
-            }
+           
 
             //On récupère toutes les logs
             const logs = await LogCommand.find();
