@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
-import { Restaurant } from "../model/restaurant-model";
+import { Restaurant, RestaurantAttributes } from "../model/restaurant-model";
 import { Type } from "../model/type-model";
+import {UUID, WhereOptions} from 'sequelize';
+import jwt from 'jsonwebtoken';
+
+const SECRET_KEY = process.env.ACCESS_JWT_KEY || "isEmptyJWT_KEY";
 
 const restaurantController = {
 
@@ -9,7 +13,7 @@ const restaurantController = {
             const { ownerId, logo, restaurantName, address, siret, codePostal, types } = req.body;
 
             if (!restaurantName || !address || !siret || !codePostal) {
-                res.status(400).json({ error: "Les champs restaurantName, address, siret et codePostal sont requis." });
+                res.status(400).json({ error: "Les champs name, address, siret et codePostal sont requis." });
                 return;
             }
 
@@ -60,20 +64,13 @@ const restaurantController = {
         }
     },
 
-    getRestaurant: async (req: Request, res: Response): Promise<void> => {
+    getRestaurant: async (req: Request, res: Response): Promise<any> => {
         try {
-            const { id } = req.params;
+            const { ownerId } = req.params;
 
-            // Recherche du restaurant par UUID
             const restaurant = await Restaurant.findOne({
-                where: { id },
-                include: [
-                    {
-                        model: Type,
-                        attributes: ["id", "name", "icon"],
-                        through: { attributes: [] },
-                    },
-                ],
+                where: { ownerId },
+
             });
 
             if (!restaurant) {
@@ -92,25 +89,13 @@ const restaurantController = {
         }
     },
 
-    getAllRestaurants: async (req: Request, res: Response): Promise<void> => {
+    getAllRestaurants: async (req: Request, res: Response): Promise<any> => {
         try {
-            const restaurants = await Restaurant.findAll({
-                include: [
-                    {
-                        model: Type,
-                        attributes: ["id", "name", "icon"],
-                        through: { attributes: [] },
-                    },
-                ],
-            });
-
-            if (restaurants.length === 0) {
-                res.status(404).json({ error: "Aucun restaurant trouvé." });
-                return;
-            }
+            const restaurants = await Restaurant.findAll();
 
             res.status(200).json(restaurants);
-        } catch (error: unknown) {
+
+        } catch (error) {
             if (error instanceof Error) {
                 console.error("Erreur lors de la récupération des restaurants :", error.message);
                 res.status(500).json({ error: "Erreur serveur : " + error.message });
@@ -120,49 +105,57 @@ const restaurantController = {
         }
     },
 
-    // listRestaurants: async (req: Request, res: Response): Promise<void> => {
-    //     try {
-    //         const restaurants = await Restaurant.findAll();
-    //
-    //         if (restaurants.length === 0) {
-    //             res.status(404).json({ error: "Aucun restaurant trouvé." });
-    //             return;
-    //         }
-    //
-    //         res.status(200).json(restaurants);
-    //     } catch (error: unknown) {
-    //         if (error instanceof Error) {
-    //             console.error("Erreur lors de la récupération des restaurants :", error.message);
-    //             res.status(500).json({ error: "Erreur serveur : " + error.message });
-    //         } else {
-    //             res.status(500).json({ error: "Erreur serveur inconnue." });
-    //         }
-    //     }
-    // },
 
-    updateRestaurant: async (req: Request, res: Response): Promise<void> => {
+    updateRestaurant: async (req: Request, res: Response): Promise<any> => {
         try {
-            const { id } = req.params;
-            const { logo, restaurantName, type, address, siret } = req.body;
 
-            if (!logo || !restaurantName || !type || !address || !siret) {
+            const allowedRoles = ['admin'];
+            const token = req.headers.authorization?.split(' ')[1];
+
+            console.log("token:", token);
+
+            if (!token) {
+                return res.status(401).json({ error: 'Accès refusé : non identifié' });
+            }
+
+            const { ownerId } = req.params;
+
+            const decoded = jwt.verify(token, SECRET_KEY) as any;
+
+            console.log("secret key: ", SECRET_KEY);
+
+            //On va vérifier si l'utilisateur connecté est admin ou si il s'agit de l'utilisateur qui fait la demande
+            if (decoded.uuid !== ownerId  && !allowedRoles.includes(decoded.type)) {
+                console.log("ownerId:", ownerId);
+                console.log("decoded.uuid:", decoded.uuid);
+                return res.status(403).json({ error: 'Accès refusé : privilèges insuffisants' });
+            }
+
+            const restaurant = await Restaurant.findOne(
+                { where: { ownerId } }
+            );
+
+            if (!restaurant) {
+                res.status(404).json({ error: "Restaurant non trouvé." });
+                return;
+            }
+
+            const { restaurantName, address, siret, logo, codePostal, type } = req.body;
+            restaurant.restaurantName = restaurantName;
+            restaurant.address = address;
+            restaurant.siret = siret;
+            restaurant.logo = logo;
+            restaurant.codePostal = codePostal;
+
+            if (!restaurantName || !address || !siret || !logo || !codePostal) {
                 res.status(400).json({ error: "Tous les champs sont requis." });
                 return;
             }
 
-            const [updated] = await Restaurant.update(
-                { logo, restaurantName, type, address, siret },
-                { where: { id } }
-            );
+            await restaurant.save();
+            res.status(200).json(restaurant);
 
-            if (updated === 0) {
-                res.status(404).json({ error: "Restaurant non reconnu." });
-                return;
-            }
-
-            const updatedRestaurant = await Restaurant.findOne({ where: { id } });
-            res.status(200).json(updatedRestaurant);
-        } catch (error: unknown) {
+        } catch (error) {
             if (error instanceof Error) {
                 console.error("Erreur lors de la mise à jour du restaurant :", error.message);
                 res.status(500).json({ error: "Erreur serveur : " + error.message });
@@ -172,18 +165,33 @@ const restaurantController = {
         }
     },
 
-    deleteRestaurant: async (req: Request, res: Response): Promise<void> => {
+    deleteRestaurant: async (req: Request, res: Response): Promise<any> => {
         try {
+
+            //On ajoute un contrôle sur le rôle de l'utilisateur
+            const allowedRoles = ['admin'];
+            const token = req.headers.authorization?.split(' ')[1];
+
+            if (!token) {
+                return res.status(401).json({ error: 'Accès refusé : non identifié' });
+            }
+
+            const decoded = jwt.verify(token, SECRET_KEY) as any;
+
+            if (!allowedRoles.includes(decoded.type)) {
+                return res.status(403).json({ error: 'Accès refusé : privilèges insuffisants' });
+            }
+
             const { id } = req.params;
 
-            const deleted = await Restaurant.destroy({ where: { id } });
+            const restaurant = await Restaurant.destroy({ where: { id } });
 
-            if (deleted === 0) {
-                res.status(404).json({ error: "Restaurant non reconnu." });
-                return;
+            if (!restaurant) {
+                return res.status(404).json({ message: "Restaurant introuvable" });
             }
 
             res.status(200).json({ message: "Restaurant supprimé." });
+
         } catch (error: unknown) {
             if (error instanceof Error) {
                 console.error("Erreur lors de la suppression du restaurant :", error.message);
