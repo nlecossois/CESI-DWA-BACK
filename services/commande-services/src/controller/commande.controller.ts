@@ -172,27 +172,12 @@ const logsController = {
 
     updateCommande: async (req: Request, res: Response): Promise<any> => {
         try {
-            const { commandId, param, value } = req.body;
-
-            // Type explicite pour `param`
-            const validParams: ("status" | "livreurId" | "finalDeliveryTTC" | "finalPriceTTC")[] = ["status", "livreurId", "finalDeliveryTTC", "finalPriceTTC"];
-
-            // Vérification si le param est valide
-            if (!validParams.includes(param)) {
-                return res.status(400).send({
-                    message: "Le champ 'param' doit être 'status', 'livreurId', 'finalDeliveryTTC' ou 'finalPriceTTC'"
-                });
-            }
+            const commandId = req.params.id;
+            const { clientId, restaurantId, livreurId, status, cartPriceHT, finalPriceTTC, menus, articles } = req.body;
 
             if (!commandId) {
                 return res.status(400).send({
-                    message: "Le champ 'commandId' est obligatoire"
-                });
-            }
-
-            if (!value) {
-                return res.status(400).send({
-                    message: "Le champ 'value' est obligatoire"
+                    message: "L'ID de la commande est obligatoire dans l'URL"
                 });
             }
 
@@ -203,107 +188,116 @@ const logsController = {
                     message: "Commande non trouvée"
                 });
             }
-            //Si le Param est status, on vérifie que la valeur est valide
-            if (param === "status") {
+
+            // Vérification du statut si présent dans les données de mise à jour
+            if (status) {
                 const validStatuses = ["Pending", "Accepted", "In Delivery", "Completed", "Cancelled"];
-                if (!validStatuses.includes(value)) {
+                if (!validStatuses.includes(status)) {
                     return res.status(400).send({
-                        message: "Le champ 'value' doit être 'Pending', 'Accepted', 'In Delivery', 'Completed' ou 'Cancelled'"
+                        message: "Le champ 'status' doit être 'Pending', 'Accepted', 'In Delivery', 'Completed' ou 'Cancelled'"
                     });
                 }
-            }
 
-            //Si le param est status, que la value est "Cancelled", on renvoie une erreur si le status actuel est différent de "Pending"
-            if (param === "status" && value === "Cancelled") {
-                if (commande.status !== "Pending") {
+                // Vérification pour l'annulation
+                if (status === "Cancelled" && commande.status !== "Pending") {
                     return res.status(400).send({
                         message: "Impossible d'annuler une commande qui n'est pas dans l'état 'Pending'"
                     });
                 }
             }
 
-
-            //On va appeler l'API pour notifier un utilisateur en fonction du cas
-            //On commence par récuperer le tokenJWT de l'utilisateur
+            // On va appeler l'API pour notifier un utilisateur en fonction du cas
             const token = req.headers.authorization?.split(' ')[1];
             if (!token) {
                 return res.status(401).json({ error: 'Accès refusé : non identifié' });
             }
-            if(param === "status" && value === "Accepted") {
-                await fetch("http://config-services:3007/config/postNotification", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({
-                        userId: commande.clientId,
-                        type: "success",
-                        title: "Votre commande a été acceptée",
-                        message: `Votre commande a été acceptée par le restaurant`,
-                    }),
-                }).catch(err => {
-                    console.error("❌ Erreur lors de l'envoi du de la notification :", err);
-                });
 
+            // Gestion des notifications en fonction du changement de statut
+            if (status) {
+                switch (status) {
+                    case "Accepted":
+                        await fetch("http://config-services:3007/config/postNotification", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${token}`,
+                            },
+                            body: JSON.stringify({
+                                userId: commande.clientId,
+                                type: "success",
+                                title: "Votre commande a été acceptée",
+                                message: `Votre commande a été acceptée par le restaurant`,
+                            }),
+                        }).catch(err => {
+                            console.error("❌ Erreur lors de l'envoi de la notification :", err);
+                        });
+                        break;
+
+                    case "In Delivery":
+                        await fetch("http://config-services:3007/config/postNotification", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${token}`,
+                            },
+                            body: JSON.stringify({
+                                userId: commande.clientId,
+                                type: "info",
+                                title: "Votre commande est en cours de livraison",
+                                message: `Votre commande est en cours de livraison, le livreur arrivera bientôt`,
+                            }),
+                        }).catch(err => {
+                            console.error("❌ Erreur lors de l'envoi de la notification :", err);
+                        });
+                        break;
+
+                    case "Completed":
+                        await fetch("http://config-services:3007/config/postNotification", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${token}`,
+                            },
+                            body: JSON.stringify({
+                                userId: commande.clientId,
+                                type: "success",
+                                title: "Bon appetit !",
+                                message: `Votre commande a été livrée avec succès`,
+                            }),
+                        }).catch(err => {
+                            console.error("❌ Erreur lors de l'envoi de la notification :", err);
+                        });
+
+                        await fetch("http://config-services:3007/config/postNotification", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${token}`,
+                            },
+                            body: JSON.stringify({
+                                userId: commande.livreurId,
+                                type: "success",
+                                title: "Commande livrée !",
+                                message: `La commande a bien été livrée`,
+                            }),
+                        }).catch(err => {
+                            console.error("❌ Erreur lors de l'envoi de la notification :", err);
+                        });
+                        break;
+                }
             }
 
-            if(param === "status" && value === "In Delivery") {
-                await fetch("http://config-services:3007/config/postNotification", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({
-                        userId: commande.clientId,
-                        type: "info",
-                        title: "Votre commande est en cours de livraison",
-                        message: `Votre commande a est en cours de livraison, le livreur arrivera bientôt`,
-                    }),
-                }).catch(err => {
-                    console.error("❌ Erreur lors de l'envoi du de la notification :", err);
-                });
-            }
-
-            if(param === "status" && value === "Completed") {
-                await fetch("http://config-services:3007/config/postNotification", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({
-                        userId: commande.clientId,
-                        type: "success",
-                        title: "Bon appetit !",
-                        message: `Votre commande a été livrée avec succès`,
-                    }),
-                }).catch(err => {
-                    console.error("❌ Erreur lors de l'envoi du de la notification :", err);
-                });
-
-
-                await fetch("http://config-services:3007/config/postNotification", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({
-                        userId: commande.livreurId,
-                        type: "success",
-                        title: "Commande livrée !",
-                        message: `La commande à bien été livrée`,
-                    }),
-                }).catch(err => {
-                    console.error("❌ Erreur lors de l'envoi du de la notification :", err);
-                });
-            }
-
-            // On met à jour la commande
-            commande.set(param, value);
-            await commande.save();
+            // Mise à jour complète de la commande
+            await commande.update({
+                clientId,
+                restaurantId,
+                livreurId,
+                status,
+                cartPriceHT,
+                finalPriceTTC,
+                menus,
+                articles
+            });
 
             res.status(200).send({
                 message: "Commande mise à jour avec succès",

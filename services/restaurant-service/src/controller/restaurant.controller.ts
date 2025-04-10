@@ -66,14 +66,19 @@ const restaurantController = {
 
     getRestaurant: async (req: Request, res: Response): Promise<any> => {
         try {
-            const { id } = req.params;
+            const { id, ownerId } = req.params;
+
+            let whereCondition = {};
+            if (id) {
+                whereCondition = { id };
+            } else if (ownerId) {
+                whereCondition = { ownerId };
+            } else {
+                return res.status(400).json({ error: "ID ou ownerId requis." });
+            }
 
             const restaurant = await Restaurant.findOne({
-                where: { id },
-                include: [{
-                    model: Type,
-                    through: { attributes: [] }, // Ne pas inclure les colonnes de la table de liaison
-                }],
+                where: whereCondition,
             });
 
             if (!restaurant) {
