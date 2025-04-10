@@ -248,7 +248,7 @@ const logsController = {
     //Récuperer toutes les logs de commandes (contrôle de rôle)
     getLogsCommand: async (req: Request, res: Response): Promise<any> => {
         try {
-            const allowedRoles = ['admin'];
+            const allowedRoles = ['admin', 'livreur'];
             const token = req.headers.authorization?.split(' ')[1];
 
             if (!token) {
