@@ -4,4 +4,5 @@ import {Application} from "express";
 export default function registerConfigRoutes(app: Application) {
   app.post("/config/getDistance", configController.callGetDistance);
   app.post("/config/getCommandPrice", configController.getCommandPrice);
+    app.post("/config/checkAddress", configController.getCommandPriceById);
 }

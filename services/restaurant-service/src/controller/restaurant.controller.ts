@@ -19,7 +19,7 @@ const restaurantController = {
 
             const newRestaurant = await Restaurant.create({
                 ownerId,
-                logo,
+                logo: logo || null,
                 restaurantName,
                 address,
                 siret,
@@ -167,7 +167,7 @@ const restaurantController = {
             restaurant.restaurantName = restaurantName;
             restaurant.address = address;
             restaurant.siret = siret;
-            restaurant.logo = logo;
+            restaurant.logo = logo || null;
             restaurant.codePostal = codePostal;
 
             if (!restaurantName || !address || !siret || !logo || !codePostal) {
