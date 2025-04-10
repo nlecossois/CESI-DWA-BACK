@@ -81,7 +81,7 @@ const livreurController = {
             const decoded = jwt.verify(token, SECRET_KEY) as any;
 
             //On va vérifier si l'utilisateur connécté est admin ou si il s'agit de l'utilisateur qui fait la demande
-            if (decoded.uuid !== uuid && !allowedRoles.includes(decoded.type)) {
+            if (decoded.id !== uuid && !allowedRoles.includes(decoded.type)) {
                 return res.status(403).json({ error: 'Accès refusé : privilèges insuffisants' });
             }
 
@@ -168,7 +168,7 @@ const livreurController = {
             const decoded = jwt.verify(token, SECRET_KEY) as any;
 
             //On va vérifier si l'utilisateur connécté est admin ou si il s'agit de l'utilisateur qui fait la demande
-            if (decoded.uuid !== uuid && !allowedRoles.includes(decoded.type)) {
+            if (decoded.id !== uuid && !allowedRoles.includes(decoded.type)) {
                 return res.status(403).json({ error: 'Accès refusé : privilèges insuffisants' });
             }
 

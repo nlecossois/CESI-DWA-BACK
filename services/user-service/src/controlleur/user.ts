@@ -85,7 +85,7 @@ async function createRestaurant(userId: string, extra: any, authToken: string | 
     try {
         const restaurantData = {
             ownerId: userId,
-            restaurantName: extra.name ?? `${extra.name}'s Restaurant`,
+            restaurantName: extra.restaurantName ?? `${extra.restaurantName}'s Restaurant`,
             address: extra.address ?? "Adresse à définir",
             siret: extra.siret ?? "SIRET à définir",
             logo: extra.logo ?? null,
@@ -102,7 +102,7 @@ async function createRestaurant(userId: string, extra: any, authToken: string | 
         // Retourner uniquement les données nécessaires
         return {
             id: response.data.id,
-            name: response.data.restaurantName,
+            restaurantName: response.data.restaurantName,
             address: response.data.address,
             siret: response.data.siret,
             logo: response.data.logo,

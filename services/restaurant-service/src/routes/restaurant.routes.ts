@@ -6,9 +6,9 @@ export default function registerRestaurantRoutes(app: Application) {
     app.get("/restaurants/types", restaurantController.getAllTypes);
 
     // Routes protégées pour les restaurants
+    app.get("/restaurants/", restaurantController.getAllRestaurants);
     app.post("/restaurants/", restaurantController.createRestaurant);
-    app.get("/restaurants/:id", restaurantController.getRestaurant);
-    app.get("/getAllRestaurants", restaurantController.getAllRestaurants);
-    app.put("/restaurants/:id", restaurantController.updateRestaurant);
-    app.delete("/restaurants/:id", restaurantController.deleteRestaurant);
+    app.get("/restaurants/:ownerId", restaurantController.getRestaurant);
+    app.put("/restaurants/:ownerId", restaurantController.updateRestaurant);
+    app.delete("/restaurants/:ownerId", restaurantController.deleteRestaurant);
 }
