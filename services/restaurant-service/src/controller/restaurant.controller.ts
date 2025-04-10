@@ -125,9 +125,7 @@ const restaurantController = {
             console.log("secret key: ", SECRET_KEY);
 
             //On va vérifier si l'utilisateur connecté est admin ou si il s'agit de l'utilisateur qui fait la demande
-            if (decoded.uuid !== ownerId  && !allowedRoles.includes(decoded.type)) {
-                console.log("ownerId:", ownerId);
-                console.log("decoded.uuid:", decoded.uuid);
+            if (decoded.id !== ownerId  && !allowedRoles.includes(decoded.type)) {
                 return res.status(403).json({ error: 'Accès refusé : privilèges insuffisants' });
             }
 
