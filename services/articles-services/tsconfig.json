@@ -4,18 +4,14 @@
     "module": "CommonJS",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "outDir": "./dist",
+    "outDir": "../../dist",
     "strict": true,
-    "baseUrl": "./src",
-    "rootDir": "./src",
+    "baseUrl": "services",
+    "rootDir": "../",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "typeRoots": ["node_modules/@types"],
-    "paths": {
-      "*": ["*"]
-    }
-  },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
+    "allowImportingTsExtensions": true
+  }
 }

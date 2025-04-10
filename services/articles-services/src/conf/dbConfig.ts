@@ -1,7 +1,8 @@
-import { Sequelize } from 'sequelize-typescript';
-import { Article } from '../model/article-model';
-import { Menu } from '../model/menu-model';
-import { MenuArticle } from '../model/menu-article';
+import { Sequelize } from "sequelize-typescript";
+import dotenv from "dotenv";
+import { Article } from "../model/article-model";
+import { Menu } from "../model/menu-model";
+import { MenuArticle } from "../model/menu-article";
 
 export const sequelize = new Sequelize({
     dialect: 'postgres',

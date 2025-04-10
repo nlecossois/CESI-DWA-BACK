@@ -1,21 +1,14 @@
 import { Options } from 'swagger-jsdoc';
 
-const PORT = process.env.ARTICLES_SERVICE_PORT || 3002;
-
 const swaggerOptions: Options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'API Articles',
+      title: 'API articles-service',
       version: '1.0.0',
-      description: 'API pour la gestion des articles et des menus',
+      description: 'Documentation de l\'API Articles Service',
     },
-    servers: [
-      {
-        url: `http://localhost:${PORT}`,
-        description: 'Serveur de développement',
-      },
-    ],
+    servers: [{ url: 'http://localhost:4004' }],
     components: {
       securitySchemes: {
         BearerAuth: {
@@ -27,7 +20,8 @@ const swaggerOptions: Options = {
     },
     security: [{ BearerAuth: [] }],
   },
-  apis: ['./src/doc/*.ts'],
+  apis: ['./src/docs/*.ts'],
 };
 
-export default swaggerOptions; 
+
+export default swaggerOptions;
