@@ -110,7 +110,7 @@ router.post('/login', async (req: any, res: any) => {
               "Content-Type": "application/json",
               "Authorization": `Bearer ${token}`,
           },
-          body: JSON.stringify({ uuid: user.id }),
+          body: JSON.stringify({ uuid: user.id, name: user.name, type: user.type }),
       }).catch(err => {
           console.error("❌ Erreur lors de l'envoi du log de connexion :", err);
       });
