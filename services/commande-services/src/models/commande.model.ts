@@ -1,5 +1,6 @@
 import { Optional } from "sequelize";
 import { Table, Column, DataType, Model } from "sequelize-typescript";
+import {Col} from "sequelize/types/utils";
 
 export interface CommandeAttributes {
     id: string;
@@ -8,6 +9,7 @@ export interface CommandeAttributes {
     livreurId: string | null;
     status: "Pending" | "Accepted" | "In Delivery" | "Completed" | "Cancelled";
     cartPriceHT: number;
+    finalDeliveryTTC: number | null;
     finalPriceTTC: number | null;
     menus: Array<{
         uuid: string;
@@ -45,6 +47,9 @@ export class Commande extends Model<CommandeAttributes, CommandeCreationAttribut
 
     @Column({ type: DataType.DECIMAL, allowNull: false })
     cartPriceHT!: number;
+
+    @Column({ type: DataType.DECIMAL, allowNull: true })
+    finalDeliveryTTC!: number | null;
 
     @Column({ type: DataType.DECIMAL, allowNull: true })
     finalPriceTTC!: number | null;

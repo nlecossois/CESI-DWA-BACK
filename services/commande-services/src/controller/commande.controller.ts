@@ -9,7 +9,7 @@ const logsController = {
 
     createCommande: async (req: Request, res: Response): Promise<any> => {
         try {
-            const { clientId, restaurantId, livreurId, status, cartPriceHT, finalPriceTTC, menus, articles } = req.body;
+            const { clientId, restaurantId, livreurId, status, cartPriceHT, finalDeliveryTTC, finalPriceTTC, menus, articles } = req.body;
 
             // Vérification de la présence des données obligatoires
             if (!clientId || !restaurantId || !status || !cartPriceHT) {
@@ -25,6 +25,7 @@ const logsController = {
                 livreurId: livreurId || null, // livreurId est optionnel
                 status,
                 cartPriceHT,
+                finalDeliveryTTC: finalDeliveryTTC || null, // finalDeliveryTTC est optionnel
                 finalPriceTTC: finalPriceTTC || null, // finalPriceTTC est optionnel
                 menus,
                 articles
@@ -68,6 +69,45 @@ const logsController = {
                 console.error("❌ Erreur inconnue lors de la création de la commande");
                 res.status(500).send({
                     message: "Erreur inconnue lors de la création de la commande"
+                });
+            }
+        }
+    },
+
+    getCommandById: async (req: Request, res: Response): Promise<any> => {
+        try {
+            //On récupère une seule commande par l'uuid passé dans l'url
+            const { uuid } = req.params;
+
+            if(!uuid) {
+                return res.status(400).send({
+                    message: "L'UUID de la commande est obligatoire"
+                });
+            }
+
+            const commande = await Commande.findOne({ where: { id: uuid } });
+            if (!commande) {
+                return res.status(404).send({
+                    message: "Commande non trouvée"
+                });
+            }
+            res.status(200).send({
+                message: "Commande récupérée avec succès",
+                data: commande
+            });
+
+
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                console.error("❌ Erreur lors de la récupération de la commande :", error.message);
+                res.status(500).send({
+                    message: "Erreur lors de la récupération de la commande",
+                    error: error.message
+                });
+            } else {
+                console.error("❌ Erreur inconnue lors de la récupération de la commande");
+                res.status(500).send({
+                    message: "Erreur inconnue lors de la récupération de la commande"
                 });
             }
         }
@@ -133,12 +173,12 @@ const logsController = {
             const { commandId, param, value } = req.body;
 
             // Type explicite pour `param`
-            const validParams: ("status" | "livreurId" | "finalPriceTTC")[] = ["status", "livreurId", "finalPriceTTC"];
+            const validParams: ("status" | "livreurId" | "finalDeliveryTTC" | "finalPriceTTC")[] = ["status", "livreurId", "finalDeliveryTTC", "finalPriceTTC"];
 
             // Vérification si le param est valide
             if (!validParams.includes(param)) {
                 return res.status(400).send({
-                    message: "Le champ 'param' doit être 'status', 'livreurId' ou 'finalPriceTTC'"
+                    message: "Le champ 'param' doit être 'status', 'livreurId', 'finalDeliveryTTC' ou 'finalPriceTTC'"
                 });
             }
 
