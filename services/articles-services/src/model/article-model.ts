@@ -10,6 +10,7 @@ export interface Article {
   prix: number;
   type: string;
   restaurantId: string;
+  ownerId: string;
 }
 
 export interface ArticleAttributes extends Optional<Article, "id"> {}
@@ -33,6 +34,9 @@ export class Article extends Model {
 
   @Column({ type: DataType.UUID, allowNull: false })
   restaurantId!: string;
+
+  @Column({ type: DataType.UUID, allowNull: false })
+  ownerId!: string;
 
   // Relation avec la table de liaison
   @BelongsToMany(() => Menu, () => MenuArticle)

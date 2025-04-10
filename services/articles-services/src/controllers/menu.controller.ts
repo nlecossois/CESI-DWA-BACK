@@ -1,6 +1,9 @@
 import { Menu } from "../model/menu-model";
 import { Article } from "../model/article-model";
 import { v4 as uuidv4 } from "uuid";
+import jwt from 'jsonwebtoken';
+
+const SECRET_KEY = process.env.ACCESS_JWT_KEY || "isEmptyJWT_KEY";
 
 export async function getMenus(restaurantId: string) {
     try {
@@ -15,8 +18,21 @@ export async function getMenus(restaurantId: string) {
     }
 }
 
-export async function addMenu(menuData: any) {
+export async function addMenu(menuData: any, req: any, res: any) {
     try {
+        const allowedRoles = ['admin'];
+        const token = req.headers.authorization?.split(' ')[1];
+        if (!token) {
+            return res.status(401).json({ error: 'Accès refusé : non identifié' });
+        }
+
+        const decoded = jwt.verify(token, SECRET_KEY) as any;
+        const id = decoded.id;
+
+        if (id !== menuData.ownerId && !allowedRoles.includes(decoded.type)) {
+            return res.status(403).json({ error: 'Accès refusé : privilèges insuffisants' });
+        }
+
         const menuId = uuidv4();
         const menu = await Menu.create({
             id: menuId,
@@ -29,12 +45,26 @@ export async function addMenu(menuData: any) {
     }
 }
 
-export async function editMenu(menuId: string, field: string, value: any) {
+export async function editMenu(menuId: string, field: string, value: any, ownerId: string, req: any, res: any) {
     try {
+        const allowedRoles = ['admin'];
+        const token = req.headers.authorization?.split(' ')[1];
+        if (!token) {
+            return res.status(401).json({ error: 'Accès refusé : non identifié' });
+        }
+
+        const decoded = jwt.verify(token, SECRET_KEY) as any;
+        const id = decoded.id;
+
+        if (id !== ownerId && !allowedRoles.includes(decoded.type)) {
+            return res.status(403).json({ error: 'Accès refusé : privilèges insuffisants' });
+        }
+
         const menu = await Menu.findByPk(menuId);
         if (!menu) {
-            throw new Error("Menu non trouvé");
+            return res.status(404).json({ error: "Menu non trouvé" });
         }
+
         await menu.update({ [field]: value });
         return menu;
     } catch (error) {
@@ -43,12 +73,26 @@ export async function editMenu(menuId: string, field: string, value: any) {
     }
 }
 
-export async function deleteMenu(menuId: string) {
+export async function deleteMenu(menuId: string, ownerId: string, req: any, res: any) {
     try {
+        const allowedRoles = ['admin'];
+        const token = req.headers.authorization?.split(' ')[1];
+        if (!token) {
+            return res.status(401).json({ error: 'Accès refusé : non identifié' });
+        }
+
+        const decoded = jwt.verify(token, SECRET_KEY) as any;
+        const id = decoded.id;
+
+        if (id !== ownerId && !allowedRoles.includes(decoded.type)) {
+            return res.status(403).json({ error: 'Accès refusé : privilèges insuffisants' });
+        }
+
         const menu = await Menu.findByPk(menuId);
         if (!menu) {
-            throw new Error("Menu non trouvé");
+            return res.status(404).json({ error: "Menu non trouvé" });
         }
+
         await menu.destroy();
         return menu;
     } catch (error) {
@@ -57,13 +101,26 @@ export async function deleteMenu(menuId: string) {
     }
 }
 
-export async function addArticleToMenu(menuId: string, articleId: string) {
+export async function addArticleToMenu(menuId: string, articleId: string, ownerId: string, req: any, res: any) {
     try {
+        const allowedRoles = ['admin'];
+        const token = req.headers.authorization?.split(' ')[1];
+        if (!token) {
+            return res.status(401).json({ error: 'Accès refusé : non identifié' });
+        }
+
+        const decoded = jwt.verify(token, SECRET_KEY) as any;
+        const id = decoded.id;
+
+        if (id !== ownerId && !allowedRoles.includes(decoded.type)) {
+            return res.status(403).json({ error: 'Accès refusé : privilèges insuffisants' });
+        }
+
         const menu = await Menu.findByPk(menuId);
         const article = await Article.findByPk(articleId);
         
         if (!menu || !article) {
-            throw new Error("Menu ou article non trouvé");
+            return res.status(404).json({ error: "Menu ou article non trouvé" });
         }
         
         await menu.$add('articles', article);
@@ -74,13 +131,26 @@ export async function addArticleToMenu(menuId: string, articleId: string) {
     }
 }
 
-export async function removeArticleFromMenu(menuId: string, articleId: string) {
+export async function removeArticleFromMenu(menuId: string, articleId: string, ownerId: string, req: any, res: any) {
     try {
+        const allowedRoles = ['admin'];
+        const token = req.headers.authorization?.split(' ')[1];
+        if (!token) {
+            return res.status(401).json({ error: 'Accès refusé : non identifié' });
+        }
+
+        const decoded = jwt.verify(token, SECRET_KEY) as any;
+        const id = decoded.id;
+
+        if (id !== ownerId && !allowedRoles.includes(decoded.type)) {
+            return res.status(403).json({ error: 'Accès refusé : privilèges insuffisants' });
+        }
+
         const menu = await Menu.findByPk(menuId);
         const article = await Article.findByPk(articleId);
         
         if (!menu || !article) {
-            throw new Error("Menu ou article non trouvé");
+            return res.status(404).json({ error: "Menu ou article non trouvé" });
         }
         
         await menu.$remove('articles', article);

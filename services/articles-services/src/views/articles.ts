@@ -19,8 +19,8 @@ router.get('/articles/getall', async (req: any, res: any) => {
 
 router.post('/articles/add', async (req: any, res: any) => {
     try {
-        const { email, nom, description, prix, type, restaurantId } = req.body;
-        const article = await articleController.addArticle({ nom, description, prix, type, restaurantId });
+        const { ownerId, nom, description, prix, type, restaurantId } = req.body;
+        const article = await articleController.addArticle({ nom, description, prix, type, restaurantId, ownerId }, req, res);
         res.status(201).json({ message: "Article créé", article });
     } catch (err: any) {
         console.error(err);
@@ -30,8 +30,8 @@ router.post('/articles/add', async (req: any, res: any) => {
 
 router.delete('/articles/delete', async (req: any, res: any) => {
     try {
-        const { email, uuid: articleId } = req.body;
-        const article = await articleController.deleteArticle(articleId);
+        const { uuid: articleId, ownerId } = req.body;
+        const article = await articleController.deleteArticle(articleId, ownerId, req, res);
         res.json({ message: "Article supprimé", article });
     } catch (err: any) {
         console.error(err);
@@ -41,8 +41,8 @@ router.delete('/articles/delete', async (req: any, res: any) => {
 
 router.post('/articles/edit', async (req: any, res: any) => {
     try {
-        const { email, uuid: articleId, field, value } = req.body;
-        const article = await articleController.editArticle(articleId, field, value);
+        const { uuid: articleId, field, value, ownerId } = req.body;
+        const article = await articleController.editArticle(articleId, field, value, ownerId, req, res);
         res.json({ message: "Article modifié", article });
     } catch (err: any) {
         console.error(err);
@@ -65,8 +65,8 @@ router.get('/articles/menus/getall', async (req: any, res: any) => {
 //Créer un menu pour un restaurant
 router.post('/articles/menus/add', async (req: any, res: any) => {
     try {
-        const { email, nom, prix, restaurantId } = req.body;
-        const menu = await menuController.addMenu({ nom, prix, restaurantId });
+        const { nom, prix, restaurantId, ownerId } = req.body;
+        const menu = await menuController.addMenu({ nom, prix, restaurantId, ownerId }, req, res);
         res.status(201).json({ message: "Menu créé", menu });
     } catch (err: any) {
         console.error(err);
@@ -77,8 +77,8 @@ router.post('/articles/menus/add', async (req: any, res: any) => {
 //Modifier un menu d'un restaurant
 router.post('/articles/menus/edit', async (req: any, res: any) => {
     try {
-        const { email, uuid: menuId, field, value } = req.body;
-        const menu = await menuController.editMenu(menuId, field, value);
+        const { uuid: menuId, field, value, ownerId } = req.body;
+        const menu = await menuController.editMenu(menuId, field, value, ownerId, req, res);
         res.json({ message: "Menu modifié", menu });
     } catch (err: any) {
         console.error(err);
@@ -89,8 +89,8 @@ router.post('/articles/menus/edit', async (req: any, res: any) => {
 //Supprimer un menu d'un restaurant
 router.delete('/articles/menus/delete', async (req: any, res: any) => {
     try {
-        const { email, uuid: menuId } = req.body;
-        const menu = await menuController.deleteMenu(menuId);
+        const { uuid: menuId, ownerId } = req.body;
+        const menu = await menuController.deleteMenu(menuId, ownerId, req, res);
         res.json({ message: "Menu supprimé", menu });
     } catch (err: any) {
         console.error(err);
@@ -101,8 +101,8 @@ router.delete('/articles/menus/delete', async (req: any, res: any) => {
 //Ajouter un article à un menu d'un restaurant
 router.post('/articles/menus/addarticles', async (req: any, res: any) => {
     try {
-        const { email, uuid: menuId, articleId } = req.body;
-        const result = await menuController.addArticleToMenu(menuId, articleId);
+        const { uuid: menuId, articleId, ownerId } = req.body;
+        const result = await menuController.addArticleToMenu(menuId, articleId, ownerId, req, res);
         res.json({ message: "Article ajouté au menu", result });
     } catch (err: any) {
         console.error(err);
@@ -113,8 +113,8 @@ router.post('/articles/menus/addarticles', async (req: any, res: any) => {
 //Retirer un article d'un menu d'un restaurant  
 router.post('/articles/menus/deletearticles', async (req: any, res: any) => {
     try {
-        const { email, uuid: menuId, articleId } = req.body;
-        const result = await menuController.removeArticleFromMenu(menuId, articleId);
+        const { uuid: menuId, articleId, ownerId } = req.body;
+        const result = await menuController.removeArticleFromMenu(menuId, articleId, ownerId, req, res);
         res.json({ message: "Article retiré du menu", result });
     } catch (err: any) {
         console.error(err);

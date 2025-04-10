@@ -8,6 +8,7 @@ export interface Menu {
   nom: string;
   prix: number;
   restaurantId: string;
+  ownerId: string;
 }
 
 export interface MenuAttributes extends Optional<Menu, "id"> {}
@@ -25,6 +26,9 @@ export class Menu extends Model {
 
   @Column({ type: DataType.UUID, allowNull: false })
   restaurantId!: string;
+
+  @Column({ type: DataType.UUID, allowNull: false })
+  ownerId!: string;
 
   @BelongsToMany(() => Article, () => MenuArticle)
   declare articles: Article[];
