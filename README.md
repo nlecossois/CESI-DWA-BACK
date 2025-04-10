@@ -1,6 +1,7 @@
 # CESI-DWA-BACK
 CESI Dépôt projet DWA - Back  
-Le projet n'est pas disponible en production. Certaines fonctionnalités ne sont donc pas parfaitement optimisées pour un environnement de production, comme par exemple l'absence de load-balancing ou la gestion des images. Nous aurions pu utiliser un cloud comme Google ou AWS, ou bien une application dédiée comme Kubernetes, afin de gérer la répartition de la charge, l'instanciation de multiples services et la redirection vers chacun d'eux, comme détaillé sur le schéma d'architecture du projet.
+Le projet n'est pas disponible en production. Certaines fonctionnalités ne sont donc pas parfaitement optimisées pour un environnement de production, comme par exemple l'absence de load-balancing ou la gestion des images. Nous aurions pu utiliser un cloud comme Google ou AWS, ou bien une application dédiée comme Kubernetes, afin de gérer la répartition de la charge, l'instanciation de multiples services et la redirection vers chacun d'eux, comme détaillé sur le schéma d'architecture du projet.  
+Nous passons par le framework Node.js pour chacun de nos services et par Nginx pour la gestion du proxy et la conteneurisation de nos différents services.
 
 
 ## Installation
@@ -16,18 +17,28 @@ Enfin, vous pourrez lancer la commande pour initialiser et lancer votre projet.
 - **docker-compose down** (éteins toutes les images Docker du projet)
 - **docker system prune -af --volumes** (réinitialise l'ensemble des conteneurs du projet)
 
+## Procédures de dépannages
+**Réinitialiser les conteneurs**:
+- docker-compose down
+- docker system prune -af --volumes
+- docker-compose up  
 
-## Utilisation de l'API
-En local, l'API s'appelle via **http://localhost/**
+**Réinitialisation de la base de données**:
 En cas de soucis avec la base de données, connectez-vous à l'adminer:  
 - url: http://localhost:8080/
 - Système : PostegreSQL
 - Serveur : db
 - Utilisateur : postgres
 - Mot de passe : password  
-Au moment de la connexion à la base de données, choisir la base nommée "postgres". Supprimez alors toutes les tables et lancez les commandes de down, de prune et de up pour bien tout relancer proprement.
+Au moment de la connexion à la base de données, choisir la base nommée "postgres". Supprimez alors toutes les tables et lancez les commandes de down, de prune et de up pour bien tout relancer proprement.  
 
-## Description du fonctionnement des différents services.
+**Installation des dépendances**:
+En cas d'erreurs liées à vos dépendances, réinitialisez vos conteneurs. Si cela vous arrive pendant le développement d'un nouveau service, pensez à bien agrémenter vos fichiers package.json et package-lock.json avec vos dépendances dans les "dependencies" et "dev-dependencies" en ajoutant bien le décorateur "@types/" avant le nom de votre dépendance, afin qu'au premier démarrage du conteneur, toutes vos dépendances soient correctement initialisées. Enfin, réinitialisez vos conteneurs. N'oubliez pas d'ajouter vos fichiers package.JSON et package-lock.json à votre commit afin que le problème ne se répercute pas sur les autres contributeurs du projet.
+
+## Utilisation de l'API
+En local, l'API s'appelle via **http://localhost/**
+
+## Utilisation de l'API & description du fonctionnement des différents services.
 La documentation des API de chaque service est disponible dans son Swagger dédié. Pour accéder aux Swaggers, il faut avoir lancé le projet.  
 **articles-services**:
 - Route d'utilisation : http://localhost/articles/
@@ -74,7 +85,10 @@ La documentation des API de chaque service est disponible dans son Swagger dédi
 - Route d'utilisation : http://localhost/users/
 - Port : 3000
 - Swagger : http://localhost:3000/swagger
-> Description : Gestion des utilisateurs et de l'authentification (login/register).
+> Description : Gestion des utilisateurs et de l'authentification (login/register).  
+
+**Autres**:
+Nous gérons également les services MongoDB, PostgreSQL et Adminer.
   
   
   
