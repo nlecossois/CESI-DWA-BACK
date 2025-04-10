@@ -285,11 +285,11 @@ router.put('/ban/:id', async (req: any, res: any) => {
 
 router.put('/:id', async (req: any, res: any) => {
     const { id } = req.params;
-    const { newSolde } = req.body;
+    const { name, email, balance, extra } = req.body;
     try {
-        //On contrôle la présence de l'id et de newSolde dans le body de la requête
-        if (!id || !newSolde) {
-            return res.status(400).json({ message: "L'id et le nouveau solde sont requis (id, newSolde)" });
+        //On contrôle la présence de l'id dans la requête
+        if (!id) {
+            return res.status(400).json({ message: "L'id est requis" });
         }
 
         const allowedRoles = ['admin'];
@@ -314,18 +314,66 @@ router.put('/:id', async (req: any, res: any) => {
             return res.status(404).json({ message: "Utilisateur non trouvé" });
         }
 
-        //On met à jour le solde de l'utilisateur
-        await user.update({ balance: newSolde });
+        //On prépare les données à mettre à jour
+        const updateData: any = {};
+        if (name) updateData.name = name;
+        if (email) updateData.email = email;
+        if (balance !== undefined) updateData.balance = balance;
 
-        return res.status(201).json({ message: 'Solde mis à jour : ', newSolde });
+        //On met à jour l'utilisateur
+        await user.update(updateData);
+
+        //Si des données extra sont présentes, on appelle le service correspondant
+        if (extra) {
+            try {
+                let serviceUrl = '';
+                let serviceData = {};
+
+                switch (user.type) {
+                    case UserType.CLIENT:
+                        serviceUrl = `${BASE_URLS.CLIENT}/updateClientByUserId/${id}`;
+                        serviceData = extra;
+                        break;
+                    case UserType.RESTAURANT:
+                        serviceUrl = `${BASE_URLS.RESTAURANT}/${id}`;
+                        serviceData = extra;
+                        break;
+                    case UserType.LIVREUR:
+                        serviceUrl = `${BASE_URLS.LIVREUR}/updateLivreurByUserId/${id}`;
+                        serviceData = extra;
+                        break;
+                }
+
+                if (serviceUrl) {
+                    if (user.type === UserType.LIVREUR) {
+                        await axios.post(serviceUrl, serviceData, {
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        });
+                    } else {
+                        await axios.put(serviceUrl, serviceData, {
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error("Erreur lors de la mise à jour du service spécifique:", error);
+                // On continue même si la mise à jour du service spécifique échoue
+            }
+        }
+
+        return res.status(201).json({ message: 'Utilisateur mis à jour avec succès', user });
 
     } catch (err: unknown) {
         if(err instanceof Error){
-            console.error("Erreur lors de la mise à jour du solde:", err.message);
-            res.status(500).json({ message: "Erreur lors de la mise à jour du solde:" + err.message });
+            console.error("Erreur lors de la mise à jour de l'utilisateur:", err.message);
+            res.status(500).json({ message: "Erreur lors de la mise à jour de l'utilisateur:" + err.message });
         } else {
-            console.error("Erreur inconnue lors de la mise à jour du solde.");
-            res.status(500).json({message: "Erreur inconnue lors de la mise à jour du solde"});
+            console.error("Erreur inconnue lors de la mise à jour de l'utilisateur.");
+            res.status(500).json({message: "Erreur inconnue lors de la mise à jour de l'utilisateur"});
         }
     }
 });
