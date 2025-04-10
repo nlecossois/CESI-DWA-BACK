@@ -11,6 +11,8 @@ export interface CommandeAttributes {
     cartPriceHT: number;
     finalDeliveryTTC: number | null;
     finalPriceTTC: number | null;
+    addressClient: string;
+    addressRestaurant: string;
     menus: Array<{
         uuid: string;
         uuid_restaurant: string;
@@ -53,6 +55,12 @@ export class Commande extends Model<CommandeAttributes, CommandeCreationAttribut
 
     @Column({ type: DataType.DECIMAL, allowNull: true })
     finalPriceTTC!: number | null;
+
+    @Column({ type: DataType.STRING, allowNull: false })
+    addressClient!: string;
+
+    @Column({ type: DataType.STRING, allowNull: false })
+    addressRestaurant!: string;
 
     @Column({ type: DataType.JSONB, allowNull: true })
     menus!: Array<{

@@ -33,6 +33,12 @@
  *           type: number
  *           format: float
  *           description: "Prix final de la commande, toutes taxes comprises (optionnel)"
+ *         addressClient:
+ *           type: string
+ *           description: "Adresse du client"
+ *         addressRestaurant:
+ *           type: string
+ *           description: "Adresse du restaurant"
  *         menus:
  *           type: array
  *           items:

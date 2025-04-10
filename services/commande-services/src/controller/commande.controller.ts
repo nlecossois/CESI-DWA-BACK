@@ -9,12 +9,12 @@ const logsController = {
 
     createCommande: async (req: Request, res: Response): Promise<any> => {
         try {
-            const { clientId, restaurantId, livreurId, status, cartPriceHT, finalDeliveryTTC, finalPriceTTC, menus, articles } = req.body;
+            const { clientId, restaurantId, livreurId, status, cartPriceHT, finalDeliveryTTC, finalPriceTTC, addressClient, addressRestaurant, menus, articles } = req.body;
 
             // Vérification de la présence des données obligatoires
-            if (!clientId || !restaurantId || !status || !cartPriceHT) {
+            if (!clientId || !restaurantId || !status || !cartPriceHT || !addressClient || !addressRestaurant) {
                 return res.status(400).send({
-                    message: "Les champs 'clientId', 'restaurantId', 'status', et 'cartPriceHT' sont obligatoires"
+                    message: "Les champs 'clientId', 'restaurantId', 'status', 'addressClient', 'addressRestaurant' et 'cartPriceHT' sont obligatoires"
                 });
             }
 
@@ -27,6 +27,8 @@ const logsController = {
                 cartPriceHT,
                 finalDeliveryTTC: finalDeliveryTTC || null, // finalDeliveryTTC est optionnel
                 finalPriceTTC: finalPriceTTC || null, // finalPriceTTC est optionnel
+                addressClient,
+                addressRestaurant,
                 menus,
                 articles
             });
