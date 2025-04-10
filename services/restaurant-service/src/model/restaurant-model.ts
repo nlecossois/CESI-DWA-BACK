@@ -23,7 +23,7 @@ export class Restaurant extends Model {
   @Column({ type: DataType.UUID, allowNull: false })
   ownerId!: string;
 
-  @Column({ type: DataType.STRING, allowNull: true })
+  @Column({ type: DataType.TEXT, allowNull: true })
   logo!: string | null;
 
   @Column({ type: DataType.STRING, allowNull: false })
