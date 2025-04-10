@@ -21,6 +21,36 @@
  *     responses:
  *       200:
  *         description: Notifications trouvées avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                         description: Identifiant de la notification
+ *                       userId:
+ *                         type: string
+ *                         description: UUID de l'utilisateur
+ *                       type:
+ *                         type: string
+ *                         description: Type de notification
+ *                       title:
+ *                         type: string
+ *                         description: Titre de la notification
+ *                       message:
+ *                         type: string
+ *                         description: Message de la notification
+ *                       __v:
+ *                         type: number
+ *                         description: Version de la notification
  *       404:
  *         description: Notifications non trouvées
  *       500:
