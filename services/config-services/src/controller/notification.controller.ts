@@ -39,6 +39,9 @@ const notificationController = {
                 });
             }
 
+            //On supprime les notifications en base après récupération
+            await Notification.deleteMany({ userId: uuid });
+
             //On renvoie les notifications à l'utilisateur avec leurs IDs
             console.log("✅ Notifications récupérées avec succès :", notifications);
             res.status(200).send({
