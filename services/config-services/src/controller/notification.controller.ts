@@ -34,8 +34,9 @@ const notificationController = {
             //On va récupérer les notifications de l'utilisateur
             const notifications = await Notification.find({ userId: uuid });
             if (notifications.length === 0) {
-                return res.status(404).send({
-                    message: "Aucune notification trouvée pour cet utilisateur"
+                return res.status(200).send({
+                    message: "Aucune notification trouvée pour cet utilisateur",
+                    data: []
                 });
             }
 
